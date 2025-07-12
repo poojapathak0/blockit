@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Debug Unblock Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .btn {
+            padding: 15px 25px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #007cba;
+            color: white;
+        }
+        .btn:hover {
+            background: #005a87;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Unblock Page</h1>
+    <p id="blockedSite">Loading site info...</p>
+    
+    <div class="status" id="statusArea">
+        Ready to test buttons...
+    </div>
+    
+    <button class="btn" id="testBtn1">Test Button 1</button>
+    <button class="btn" id="testBtn2">Test Button 2</button>
+    <button class="btn" id="unblockBtn">Start Unblock</button>
+    <button class="btn" id="redirectBtn">Redirect Test</button>
+    
+    <div id="logArea" style="margin-top: 20px; padding: 10px; background: #fff; border: 1px solid #ccc; max-height: 300px; overflow-y: auto;">
+        <strong>Debug Log:</strong><br>
+    </div>
+
+    <script>
+        // Debug logging function
+        function log(message) {
+            console.log(message);
+            const logArea = document.getElementById('logArea');
+            logArea.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+        
+        // Initialize
+        log('🛡️ Debug page loaded');
+        
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const blockedSite = urlParams.get('site') || 'example.com';
+        document.getElementById('blockedSite').textContent = 'Blocked Site: ' + blockedSite;
+        log('Blocked site: ' + blockedSite);
+        
+        // Status function
+        function showStatus(message) {
+            document.getElementById('statusArea').innerHTML = message;
+            log('Status: ' + message);
+        }
+        
+        // Button functions
+        function testButton1() {
+            log('✅ Test Button 1 clicked!');
+            showStatus('Button 1 is working!');
+        }
+        
+        function testButton2() {
+            log('✅ Test Button 2 clicked!');
+            showStatus('Button 2 is working!');
+            
+            // Test extension communication
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                try {
+                    chrome.runtime.sendMessage({action: 'getStats'}, (response) => {
+                        if (chrome.runtime.lastError) {
+                            log('❌ Extension error: ' + chrome.runtime.lastError.message);
+                        } else {
+                            log('✅ Extension communication works: ' + JSON.stringify(response));
+                        }
+                    });
+                } catch (error) {
+                    log('❌ Extension exception: ' + error.message);
+                }
+            } else {
+                log('❌ Chrome runtime not available');
+            }
+        }
+        
+        function startUnblock() {
+            log('🔓 Unblock button clicked!');
+            showStatus('Starting unblock process...');
+            
+            // Test unblock communication
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                try {
+                    chrome.runtime.sendMessage({
+                        action: 'completeUnblock',
+                        domain: blockedSite
+                    }, (response) => {
+                        if (chrome.runtime.lastError) {
+                            log('❌ Unblock error: ' + chrome.runtime.lastError.message);
+                            performDirectUnblock();
+                        } else {
+                            log('✅ Unblock response: ' + JSON.stringify(response));
+                            showStatus('Unblock successful via extension!');
+                        }
+                    });
+                } catch (error) {
+                    log('❌ Unblock exception: ' + error.message);
+                    performDirectUnblock();
+                }
+            } else {
+                log('⚠️ Extension not available, using direct unblock');
+                performDirectUnblock();
+            }
+        }
+        
+        function performDirectUnblock() {
+            log('🔄 Performing direct unblock...');
+            try {
+                const unblockData = {
+                    domain: blockedSite,
+                    unblockTime: Date.now(),
+                    reblockTime: Date.now() + (2 * 60 * 60 * 1000)
+                };
+                localStorage.setItem('tempUnblock_' + blockedSite, JSON.stringify(unblockData));
+                log('✅ Direct unblock stored in localStorage');
+                showStatus('Direct unblock successful! Redirecting...');
+                
+                setTimeout(() => {
+                    redirectToSite();
+                }, 2000);
+            } catch (error) {
+                log('❌ Direct unblock failed: ' + error.message);
+                showStatus('Unblock failed: ' + error.message);
+            }
+        }
+        
+        function redirectToSite() {
+            log('🔗 Redirecting to site...');
+            try {
+                window.location.href = 'https://' + blockedSite;
+            } catch (error) {
+                log('❌ Redirect failed: ' + error.message);
+                showStatus('Redirect failed. Please navigate manually to: https://' + blockedSite);
+            }
+        }
+        
+        function testRedirect() {
+            log('🧪 Testing redirect...');
+            redirectToSite();
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            log('📋 DOM content loaded, setting up event listeners...');
+            
+            try {
+                document.getElementById('testBtn1').addEventListener('click', testButton1);
+                log('✅ Test Button 1 listener added');
+                
+                document.getElementById('testBtn2').addEventListener('click', testButton2);
+                log('✅ Test Button 2 listener added');
+                
+                document.getElementById('unblockBtn').addEventListener('click', startUnblock);
+                log('✅ Unblock button listener added');
+                
+                document.getElementById('redirectBtn').addEventListener('click', testRedirect);
+                log('✅ Redirect button listener added');
+                
+                log('🎉 All event listeners set up successfully!');
+                showStatus('All buttons ready - click to test!');
+                
+            } catch (error) {
+                log('❌ Error setting up event listeners: ' + error.message);
+                showStatus('Error setting up buttons: ' + error.message);
+            }
+        });
+        
+        // Test if script is running
+        log('🚀 Script execution completed');
+    </script>
+</body>
+</html>

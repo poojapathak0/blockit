@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Site Blocked - Unblock Process</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .blocked-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .blocked-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .blocked-domain {
+            font-size: 24px;
+            color: #ffd700;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+        
+        .warning-text {
+            background: rgba(255, 71, 87, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #ff4757;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 25px;
+            margin: 10px;
+            border: 2px solid white;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+            background: #ff4757;
+            color: white;
+            user-select: none;
+            outline: none;
+        }
+        
+        .btn:hover {
+            background: #ff3742;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0px);
+            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.6);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-green {
+            background: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-green:hover {
+            background: #218838;
+            border-color: #218838;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .status.info {
+            background: rgba(0, 123, 255, 0.2);
+            border: 1px solid rgba(0, 123, 255, 0.5);
+            display: block;
+        }
+        
+        .status.success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.5);
+        }
+        
+        .status.error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.5);
+        }
+        
+        .debug-info {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="blocked-icon">🚫</div>
+        <div class="blocked-title">Site Blocked</div>
+        <div class="blocked-domain" id="blockedSite">Loading...</div>
+        
+        <div class="warning-text">
+            ⚠️ <strong>This site has been blocked for your productivity.</strong><br>
+            Click the buttons below to test functionality or start the unblock process.
+            <br><br>
+            🔄 <strong>Auto Re-blocking:</strong> Even if unblocked, this site will be automatically 
+            re-blocked after 2 hours.
+        </div>
+        
+        <div class="action-buttons">
+            <button type="button" class="btn btn-green" onclick="testButton()">
+                🔧 Test Button
+            </button>
+            <button type="button" class="btn" onclick="startUnblockProcess()">
+                🔓 Start Unblock Process
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="goBack()">
+                ⬅️ Go Back
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="openNewTab()">
+                🏠 New Tab
+            </button>
+        </div>
+        
+        <div id="statusArea" class="status info">
+            Ready to test buttons. Click any button above.
+        </div>
+        
+        <div id="debugInfo" class="debug-info">
+            <strong>Debug Log:</strong><br>
+            <span id="debugLog">Initializing...</span>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let blockedSite = 'Unknown Site';
+        let debugLog = [];
+        
+        // Debug logging function
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            console.log(logMessage);
+            debugLog.push(logMessage);
+            updateDebugDisplay();
+        }
+        
+        function updateDebugDisplay() {
+            const debugElement = document.getElementById('debugLog');
+            if (debugElement) {
+                debugElement.innerHTML = debugLog.slice(-10).join('<br>');
+            }
+        }
+        
+        // Show status messages
+        function showStatus(message, type = 'info') {
+            log(`Status (${type}): ${message}`);
+            const statusArea = document.getElementById('statusArea');
+            if (statusArea) {
+                statusArea.style.display = 'block';
+                statusArea.className = `status ${type}`;
+                statusArea.innerHTML = message;
+            }
+        }
+        
+        // Test button function
+        function testButton() {
+            log('✅ Test button clicked!');
+            showStatus('🎉 Button functionality is working correctly!', 'success');
+            
+            // Test extension communication
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                try {
+                    chrome.runtime.sendMessage({action: 'getStats'}, function(response) {
+                        if (chrome.runtime.lastError) {
+                            log('❌ Extension error: ' + chrome.runtime.lastError.message);
+                            showStatus('Extension communication failed: ' + chrome.runtime.lastError.message, 'error');
+                        } else {
+                            log('✅ Extension response: ' + JSON.stringify(response));
+                            showStatus('✅ Extension communication working! Stats received.', 'success');
+                        }
+                    });
+                } catch (error) {
+                    log('❌ Extension test error: ' + error.message);
+                    showStatus('Extension test failed: ' + error.message, 'error');
+                }
+            } else {
+                log('⚠️ Chrome extension API not available');
+                showStatus('⚠️ Extension API not available. Running in fallback mode.', 'info');
+            }
+        }
+        
+        // Start unblock process
+        function startUnblockProcess() {
+            log('🔓 Starting unblock process...');
+            showStatus('🔄 Starting unblock process...', 'info');
+            
+            // Try extension communication first
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                try {
+                    chrome.runtime.sendMessage({
+                        action: 'completeUnblock',
+                        domain: blockedSite
+                    }, function(response) {
+                        if (chrome.runtime.lastError) {
+                            log('❌ Extension unblock failed: ' + chrome.runtime.lastError.message);
+                            performDirectUnblock();
+                        } else {
+                            log('✅ Extension unblock successful: ' + JSON.stringify(response));
+                            showUnblockSuccess();
+                        }
+                    });
+                } catch (error) {
+                    log('❌ Extension unblock error: ' + error.message);
+                    performDirectUnblock();
+                }
+            } else {
+                log('⚠️ Extension not available, using direct unblock');
+                performDirectUnblock();
+            }
+        }
+        
+        // Direct unblock fallback
+        function performDirectUnblock() {
+            log('🔄 Performing direct unblock...');
+            
+            try {
+                const unblockData = {
+                    domain: blockedSite,
+                    unblockTime: Date.now(),
+                    reblockTime: Date.now() + (2 * 60 * 60 * 1000) // 2 hours
+                };
+                
+                localStorage.setItem('tempUnblock_' + blockedSite, JSON.stringify(unblockData));
+                log('✅ Direct unblock data stored');
+                showUnblockSuccess();
+                
+            } catch (error) {
+                log('❌ Direct unblock failed: ' + error.message);
+                showStatus('❌ Unblock failed: ' + error.message, 'error');
+            }
+        }
+        
+        // Show unblock success
+        function showUnblockSuccess() {
+            log('🎉 Unblock successful!');
+            showStatus(
+                '✅ Site unblocked successfully!<br>' +
+                '⚠️ This site will be re-blocked in 2 hours.<br>' +
+                'Redirecting in 3 seconds...', 
+                'success'
+            );
+            
+            setTimeout(function() {
+                redirectToSite();
+            }, 3000);
+        }
+        
+        // Redirect to site
+        function redirectToSite() {
+            log('🔗 Redirecting to: https://' + blockedSite);
+            try {
+                window.location.href = 'https://' + blockedSite;
+            } catch (error) {
+                log('❌ Redirect failed: ' + error.message);
+                showStatus('Redirect failed. Please navigate manually to: https://' + blockedSite, 'error');
+            }
+        }
+        
+        // Go back
+        function goBack() {
+            log('⬅️ Going back...');
+            try {
+                history.back();
+            } catch (error) {
+                log('❌ Go back failed: ' + error.message);
+                showStatus('Cannot go back. Please close this tab.', 'error');
+            }
+        }
+        
+        // Open new tab
+        function openNewTab() {
+            log('🏠 Opening new tab...');
+            try {
+                if (typeof chrome !== 'undefined' && chrome.tabs) {
+                    chrome.tabs.create({url: 'chrome://newtab/'});
+                } else {
+                    window.open('chrome://newtab/', '_blank');
+                }
+            } catch (error) {
+                log('❌ New tab failed: ' + error.message);
+                window.open('about:blank', '_blank');
+            }
+        }
+        
+        // Initialize page
+        function initializePage() {
+            log('🚀 Initializing blocked page...');
+            
+            // Get blocked site from URL parameter
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                blockedSite = urlParams.get('site') || 'example.com';
+                log('📍 Blocked site: ' + blockedSite);
+                
+                // Set the site name in DOM
+                const siteElement = document.getElementById('blockedSite');
+                if (siteElement) {
+                    siteElement.textContent = blockedSite;
+                }
+                
+            } catch (error) {
+                log('❌ Error getting site parameter: ' + error.message);
+                blockedSite = 'Unknown Site';
+            }
+            
+            log('✅ Page initialization completed');
+            showStatus('Page loaded successfully. All buttons should be working.', 'info');
+        }
+        
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePage);
+        } else {
+            initializePage();
+        }
+        
+        // Also initialize immediately as fallback
+        setTimeout(initializePage, 100);
+        
+        log('📋 Script loaded successfully');
+    </script>
+</body>
+</html>

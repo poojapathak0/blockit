@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BlockIt Settings - Brave Clone</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="logo">
+          <img src="../icons/icon48.png" alt="BlockIt" class="logo-img">
+          <h1>BlockIt Settings</h1>
+        </div>
+        <div class="version">v1.0.0</div>
+      </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="shields">Brave Shields</button>
+      <button class="nav-tab" data-tab="privacy">Privacy & Security</button>
+      <button class="nav-tab" data-tab="advanced">Advanced</button>
+      <button class="nav-tab" data-tab="stats">Statistics</button>
+      <button class="nav-tab" data-tab="about">About</button>
+    </nav>
+
+    <!-- Content Sections -->
+    <main class="content">
+      <!-- Brave Shields Tab -->
+      <section id="shields" class="tab-content active">
+        <h2>Brave Shields Settings</h2>
+        
+        <div class="setting-section">
+          <div class="setting-card">
+            <div class="setting-header">
+              <h3>Global Shield Settings</h3>
+              <p>Configure default protection levels for all websites</p>
+            </div>
+            
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Brave Shields</label>
+                <span class="setting-desc">Enable or disable all protection features</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="globalShields" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Ad & Tracker Blocking</label>
+                <span class="setting-desc">Block advertisements and tracking scripts</span>
+              </div>
+              <select id="adBlockingLevel" class="select-input">
+                <option value="disabled">Disabled</option>
+                <option value="standard" selected>Standard</option>
+                <option value="aggressive">Aggressive</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>HTTPS Upgrade</label>
+                <span class="setting-desc">Automatically upgrade HTTP connections to HTTPS</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="httpsUpgradeGlobal" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Script Blocking</label>
+                <span class="setting-desc">Block JavaScript execution (may break websites)</span>
+              </div>
+              <select id="scriptBlockingLevel" class="select-input">
+                <option value="disabled" selected>Disabled</option>
+                <option value="standard">Standard</option>
+                <option value="aggressive">Aggressive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-section">
+          <div class="setting-card">
+            <div class="setting-header">
+              <h3>Site-Specific Settings</h3>
+              <p>Manage per-site shield configurations</p>
+            </div>
+            
+            <div class="site-list" id="siteList">
+              <!-- Site-specific settings will be populated here -->
+            </div>
+            
+            <button class="btn btn-secondary" id="addSiteRule">Add Site Rule</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Privacy & Security Tab -->
+      <section id="privacy" class="tab-content">
+        <h2>Privacy & Security Settings</h2>
+        
+        <div class="setting-section">
+          <div class="setting-card">
+            <div class="setting-header">
+              <h3>Fingerprinting Protection</h3>
+              <p>Protect against browser fingerprinting techniques</p>
+            </div>
+            
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Fingerprinting Protection</label>
+                <span class="setting-desc">Randomize or block fingerprinting attempts</span>
+              </div>
+              <select id="fingerprintingLevel" class="select-input">
+                <option value="disabled">Disabled</option>
+                <option value="standard" selected>Standard</option>
+                <option value="aggressive">Aggressive</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Canvas Fingerprinting</label>
+                <span class="setting-desc">Add noise to canvas fingerprinting</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="canvasProtection" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>WebRTC IP Leak Protection</label>
+                <span class="setting-desc">Prevent WebRTC from leaking your IP address</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="webrtcProtection" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-section">
+          <div class="setting-card">
+            <div class="setting-header">
+              <h3>Cookie & Storage</h3>
+              <p>Control how cookies and local storage are handled</p>
+            </div>
+            
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Cookie Blocking</label>
+                <span class="setting-desc">Block tracking and third-party cookies</span>
+              </div>
+              <select id="cookieBlockingLevel" class="select-input">
+                <option value="disabled">Disabled</option>
+                <option value="standard" selected>Block Trackers</option>
+                <option value="aggressive">Block All Third-Party</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Clear Data on Exit</label>
+                <span class="setting-desc">Clear browsing data when browser closes</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="clearDataOnExit">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Advanced Tab -->
+      <section id="advanced" class="tab-content">
+        <h2>Advanced Settings</h2>
+        
+        <div class="setting-section">
+          <div class="setting-card">
+            <div class="setting-header">
+              <h3>Filter Lists</h3>
+              <p>Manage ad blocking and privacy filter lists</p>
+            </div>
+            
+            <div class="filter-list">
+              <div class="filter-item">
+                <label class="checkbox-label">
+                  <input type="checkbox" checked>
+                  <span class="checkmark"></span>
+                  EasyList (Ads)
+                </label>
+                <span class="filter-desc">Primary ad blocking list</span>
+              </div>
+              
+              <div class="filter-item">
+                <label class="checkbox-label">
+                  <input type="checkbox" checked>
+                  <span class="checkmark"></span>
+                  EasyPrivacy (Trackers)
+                </label>
+                <span class="filter-desc">Privacy protection list</span>
+              </div>
+              
+              <div class="filter-item">
+                <label class="checkbox-label">
+                  <input type="checkbox" checked>
+                  <span class="checkmark"></span>
+                  uBlock Origin Filters
+                </label>
+                <span class="filter-desc">Additional blocking filters</span>
+              </div>
+              
+              <div class="filter-item">
+                <label class="checkbox-label">
+                  <input type="checkbox">
+                  <span class="checkmark"></span>
+                  Regional Filters
+                </label>
+                <span class="filter-desc">Language-specific filters</span>
+              </div>
+            </div>
+            
+            <div class="filter-actions">
+              <button class="btn btn-secondary" id="updateFilters">Update Filters</button>
+              <button class="btn btn-secondary" id="addCustomFilter">Add Custom Filter</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-section">
+          <div class="setting-card">
+            <div class="setting-header">
+              <h3>Developer Options</h3>
+              <p>Advanced options for developers and power users</p>
+            </div>
+            
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Debug Mode</label>
+                <span class="setting-desc">Enable console logging for debugging</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="debugMode">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Custom User Agent</label>
+                <span class="setting-desc">Override the default user agent string</span>
+              </div>
+              <input type="text" id="customUserAgent" class="text-input" placeholder="Leave empty for default">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Statistics Tab -->
+      <section id="stats" class="tab-content">
+        <h2>Protection Statistics</h2>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🛡️</div>
+            <div class="stat-number" id="totalAdsBlocked">0</div>
+            <div class="stat-label">Ads Blocked</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">👁️</div>
+            <div class="stat-number" id="totalTrackersBlocked">0</div>
+            <div class="stat-label">Trackers Blocked</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">🔒</div>
+            <div class="stat-number" id="totalHttpsUpgrades">0</div>
+            <div class="stat-label">HTTPS Upgrades</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon">📜</div>
+            <div class="stat-number" id="totalScriptsBlocked">0</div>
+            <div class="stat-label">Scripts Blocked</div>
+          </div>
+        </div>
+
+        <div class="setting-section">
+          <div class="setting-card">
+            <div class="setting-header">
+              <h3>Statistics Settings</h3>
+              <p>Configure how statistics are collected and displayed</p>
+            </div>
+            
+            <div class="setting-row">
+              <div class="setting-info">
+                <label>Collect Statistics</label>
+                <span class="setting-desc">Enable collection of blocking statistics</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="collectStats" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="stats-actions">
+              <button class="btn btn-secondary" id="resetAllStats">Reset All Statistics</button>
+              <button class="btn btn-secondary" id="exportStats">Export Statistics</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- About Tab -->
+      <section id="about" class="tab-content">
+        <h2>About BlockIt</h2>
+        
+        <div class="about-content">
+          <div class="about-hero">
+            <img src="../icons/icon128.png" alt="BlockIt" class="about-logo">
+            <h3>BlockIt - Brave Browser Clone</h3>
+            <p class="version-text">Version 1.0.0</p>
+          </div>
+          
+          <div class="about-description">
+            <p>BlockIt is a comprehensive privacy-focused browser extension that replicates the core functionality of Brave browser. It provides robust protection against ads, trackers, fingerprinting, and other privacy threats while maintaining excellent performance and compatibility.</p>
+          </div>
+          
+          <div class="feature-list">
+            <h4>Key Features:</h4>
+            <ul>
+              <li>🛡️ Advanced Ad & Tracker Blocking</li>
+              <li>🔒 Automatic HTTPS Upgrades</li>
+              <li>👁️ Fingerprinting Protection</li>
+              <li>🍪 Smart Cookie Blocking</li>
+              <li>📜 Script Blocking</li>
+              <li>📊 Real-time Statistics</li>
+              <li>⚙️ Customizable Protection Levels</li>
+              <li>🌐 Site-specific Settings</li>
+            </ul>
+          </div>
+          
+          <div class="about-links">
+            <button class="btn btn-primary" id="viewSource">View Source Code</button>
+            <button class="btn btn-secondary" id="reportBug">Report Bug</button>
+            <button class="btn btn-secondary" id="requestFeature">Request Feature</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

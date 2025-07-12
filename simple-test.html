@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Simple Extension Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .test { padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+        .working { background: #d4edda; }
+        .error { background: #f8d7da; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ Extension Quick Test</h1>
+    
+    <div id="apiTest" class="test">
+        <strong>Extension API:</strong> <span id="apiResult">Testing...</span>
+    </div>
+    
+    <div id="backgroundTest" class="test">
+        <strong>Background Script:</strong> <span id="backgroundResult">Testing...</span>
+    </div>
+    
+    <div id="blockingTest" class="test">
+        <strong>Site Blocking:</strong> <span id="blockingResult">Testing...</span>
+    </div>
+    
+    <div>
+        <button onclick="testSiteBlocking()">Test Site Blocking</button>
+        <button onclick="testUnblockProcess()">Test Unblock Process</button>
+        <button onclick="blockCurrentSite()">Block This Site</button>
+    </div>
+    
+    <div id="output" style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; font-family: monospace; white-space: pre-wrap;"></div>
+
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+        
+        // Test Extension API
+        function testAPI() {
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                document.getElementById('apiTest').className = 'test working';
+                document.getElementById('apiResult').textContent = '✅ Available';
+                log('✅ Extension API is available');
+                return true;
+            } else {
+                document.getElementById('apiTest').className = 'test error';
+                document.getElementById('apiResult').textContent = '❌ Not Available';
+                log('❌ Extension API not available');
+                return false;
+            }
+        }
+        
+        // Test Background Script
+        async function testBackground() {
+            try {
+                const response = await chrome.runtime.sendMessage({action: 'getStats'});
+                if (response) {
+                    document.getElementById('backgroundTest').className = 'test working';
+                    document.getElementById('backgroundResult').textContent = '✅ Working';
+                    log('✅ Background script responding: ' + JSON.stringify(response));
+                } else {
+                    document.getElementById('backgroundTest').className = 'test error';
+                    document.getElementById('backgroundResult').textContent = '❌ No Response';
+                    log('❌ Background script not responding');
+                }
+            } catch (error) {
+                document.getElementById('backgroundTest').className = 'test error';
+                document.getElementById('backgroundResult').textContent = '❌ Error';
+                log('❌ Background error: ' + error.message);
+            }
+        }
+        
+        // Test Site Blocking
+        async function testSiteBlocking() {
+            log('🔄 Testing site blocking...');
+            try {
+                const response = await chrome.runtime.sendMessage({
+                    action: 'getBlockedSites'
+                });
+                if (Array.isArray(response)) {
+                    document.getElementById('blockingTest').className = 'test working';
+                    document.getElementById('blockingResult').textContent = '✅ Working';
+                    log(`✅ Site blocking working - ${response.length} sites blocked: ${response.join(', ')}`);
+                } else {
+                    document.getElementById('blockingTest').className = 'test error';
+                    document.getElementById('blockingResult').textContent = '❌ Not Working';
+                    log('❌ Site blocking not working');
+                }
+            } catch (error) {
+                document.getElementById('blockingTest').className = 'test error';
+                document.getElementById('blockingResult').textContent = '❌ Error';
+                log('❌ Site blocking error: ' + error.message);
+            }
+        }
+        
+        // Test Unblock Process
+        async function testUnblockProcess() {
+            log('🔄 Testing unblock process...');
+            try {
+                const response = await chrome.runtime.sendMessage({
+                    action: 'startUnblock',
+                    domain: 'example.com'
+                });
+                if (response && response.challenges) {
+                    log(`✅ Unblock process working - ${response.challenges.length} challenges generated`);
+                } else {
+                    log('❌ Unblock process not working - no challenges returned');
+                }
+            } catch (error) {
+                log('❌ Unblock process error: ' + error.message);
+            }
+        }
+        
+        // Block Current Site
+        async function blockCurrentSite() {
+            const domain = window.location.hostname;
+            log(`🔄 Attempting to block ${domain}...`);
+            try {
+                const response = await chrome.runtime.sendMessage({
+                    action: 'blockSite',
+                    domain: domain
+                });
+                if (response) {
+                    log(`✅ Successfully blocked ${domain} - page will redirect soon`);
+                    setTimeout(() => window.location.reload(), 3000);
+                } else {
+                    log(`❌ Failed to block ${domain}`);
+                }
+            } catch (error) {
+                log('❌ Block site error: ' + error.message);
+            }
+        }
+        
+        // Run tests on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            log('🔄 Running extension tests...');
+            
+            if (testAPI()) {
+                await testBackground();
+                await testSiteBlocking();
+            }
+            
+            log('✅ Initial tests completed');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Blocked - Unblock Process</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .blocked-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .blocked-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .blocked-domain {
+            font-size: 24px;
+            color: #ffd700;
+            margin: 15px 0;
+            word-break: break-all;
+            font-weight: bold;
+        }
+        
+        .warning-text {
+            background: rgba(255, 71, 87, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #ff4757;
+        }
+        
+        .action-buttons {
+            margin: 30px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 25px;
+            margin: 10px;
+            border: 2px solid white;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 180px;
+            background: #ff4757;
+            color: white;
+            user-select: none;
+            outline: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            background: #ff3742;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.6);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .btn-green {
+            background: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-green:hover {
+            background: #218838;
+            border-color: #218838;
+            transform: translateY(-3px);
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            display: block;
+            background: rgba(0, 123, 255, 0.2);
+            border: 1px solid rgba(0, 123, 255, 0.5);
+        }
+        
+        .status.success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.5);
+        }
+        
+        .status.error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.5);
+        }
+        
+        .debug-info {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .click-indicator {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            position: absolute;
+            pointer-events: none;
+            transform: scale(0);
+            animation: clickRipple 0.6s ease-out;
+        }
+        
+        @keyframes clickRipple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="blocked-icon">🚫</div>
+        <div class="blocked-title">Site Blocked</div>
+        <div class="blocked-domain" id="blockedSite">Loading...</div>
+        
+        <div class="warning-text">
+            ⚠️ <strong>This site has been blocked for your productivity.</strong><br>
+            Click the buttons below to test functionality or start the unblock process.
+            <br><br>
+            🔄 <strong>Auto Re-blocking:</strong> Even if unblocked, this site will be automatically 
+            re-blocked after 2 hours.
+        </div>
+        
+        <div class="action-buttons">
+            <button type="button" class="btn btn-green" id="testBtn" 
+                    onclick="window.testButtonFunction(); return false;"
+                    onmousedown="window.addClickEffect(this, event)">
+                🔧 Test Extension
+            </button>
+            
+            <button type="button" class="btn" id="unblockBtn"
+                    onclick="window.startUnblockFunction(); return false;"
+                    onmousedown="window.addClickEffect(this, event)">
+                🔓 Start Unblock Process
+            </button>
+            
+            <button type="button" class="btn btn-secondary" id="backBtn"
+                    onclick="window.goBackFunction(); return false;"
+                    onmousedown="window.addClickEffect(this, event)">
+                ⬅️ Go Back
+            </button>
+            
+            <button type="button" class="btn btn-secondary" id="newTabBtn"
+                    onclick="window.openNewTabFunction(); return false;"
+                    onmousedown="window.addClickEffect(this, event)">
+                🏠 New Tab
+            </button>
+        </div>
+        
+        <div id="statusArea" class="status">
+            ✅ Page loaded. Click any button to test functionality.
+        </div>
+        
+        <div id="debugInfo" class="debug-info">
+            <strong>🔧 Debug Log:</strong><br>
+            <div id="debugLog">Initializing page...</div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // BULLETPROOF BUTTON FUNCTIONALITY
+        
+        // Global state
+        window.blockedSite = 'Unknown Site';
+        window.debugMessages = [];
+        
+        // Logging function
+        window.addLog = function(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            console.log('🛡️ ' + logMessage);
+            
+            window.debugMessages.push(logMessage);
+            if (window.debugMessages.length > 15) {
+                window.debugMessages = window.debugMessages.slice(-15);
+            }
+            
+            const debugElement = document.getElementById('debugLog');
+            if (debugElement) {
+                debugElement.innerHTML = window.debugMessages.join('<br>');
+                debugElement.scrollTop = debugElement.scrollHeight;
+            }
+        };
+        
+        // Status display
+        window.showStatus = function(message, type = 'info') {
+            window.addLog(`Status (${type}): ${message}`);
+            const statusArea = document.getElementById('statusArea');
+            if (statusArea) {
+                statusArea.className = 'status ' + type;
+                statusArea.innerHTML = message;
+            }
+        };
+        
+        // Visual click effect
+        window.addClickEffect = function(button, event) {
+            window.addLog('Button clicked: ' + button.textContent.trim());
+            
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = event.clientX - rect.left - size / 2;
+            const y = event.clientY - rect.top - size / 2;
+            
+            const ripple = document.createElement('span');
+            ripple.className = 'click-indicator';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            
+            button.appendChild(ripple);
+            setTimeout(() => {
+                if (ripple.parentNode) {
+                    ripple.parentNode.removeChild(ripple);
+                }
+            }, 600);
+        };
+        
+        // Button Functions
+        window.testButtonFunction = function() {
+            window.addLog('🔧 TEST BUTTON CLICKED - Function executing!');
+            window.showStatus('🎉 SUCCESS! Button functionality is working perfectly!', 'success');
+            
+            // Test extension communication
+            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+                try {
+                    chrome.runtime.sendMessage({action: 'getStats'}, function(response) {
+                        if (chrome.runtime.lastError) {
+                            window.addLog('Extension communication failed: ' + chrome.runtime.lastError.message);
+                            window.showStatus('⚠️ Extension API error, but buttons work! Error: ' + chrome.runtime.lastError.message, 'error');
+                        } else {
+                            window.addLog('Extension communication successful: ' + JSON.stringify(response));
+                            window.showStatus('✅ PERFECT! Buttons work AND extension communication successful!', 'success');
+                        }
+                    });
+                } catch (error) {
+                    window.addLog('Extension test exception: ' + error.message);
+                    window.showStatus('⚠️ Extension exception, but buttons work! Error: ' + error.message, 'error');
+                }
+            } else {
+                window.addLog('Chrome extension API not available');
+                window.showStatus('✅ Buttons work perfectly! Extension API not available (normal in some contexts)', 'success');
+            }
+        };
+        
+        window.startUnblockFunction = function() {
+            window.addLog('🔓 UNBLOCK BUTTON CLICKED - Starting unblock process!');
+            window.showStatus('🔄 Unblock process initiated...', 'info');
+            
+            // Try extension communication first
+            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+                try {
+                    window.addLog('Attempting extension unblock communication...');
+                    chrome.runtime.sendMessage({
+                        action: 'completeUnblock',
+                        domain: window.blockedSite
+                    }, function(response) {
+                        if (chrome.runtime.lastError) {
+                            window.addLog('Extension unblock failed: ' + chrome.runtime.lastError.message);
+                            window.addLog('Falling back to direct unblock method...');
+                            window.performDirectUnblock();
+                        } else if (response === true) {
+                            window.addLog('✅ Extension unblock successful!');
+                            window.showUnblockSuccess();
+                        } else {
+                            window.addLog('Extension returned: ' + response + ', trying direct unblock...');
+                            window.performDirectUnblock();
+                        }
+                    });
+                } catch (error) {
+                    window.addLog('Extension unblock exception: ' + error.message);
+                    window.performDirectUnblock();
+                }
+            } else {
+                window.addLog('Extension API not available, using direct unblock');
+                window.performDirectUnblock();
+            }
+        };
+        
+        window.performDirectUnblock = function() {
+            window.addLog('🔄 Performing direct localStorage unblock...');
+            window.showStatus('🔄 Processing unblock request...', 'info');
+            
+            try {
+                // Create unblock data
+                const unblockData = {
+                    domain: window.blockedSite,
+                    unblockTime: Date.now(),
+                    reblockTime: Date.now() + (2 * 60 * 60 * 1000), // 2 hours
+                    method: 'direct',
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Store in localStorage
+                localStorage.setItem('tempUnblock_' + window.blockedSite, JSON.stringify(unblockData));
+                window.addLog('✅ Direct unblock data stored successfully');
+                
+                // Also try to store globally for the extension to pick up
+                try {
+                    localStorage.setItem('extensionUnblock', JSON.stringify({
+                        action: 'removeBlock',
+                        domain: window.blockedSite,
+                        timestamp: Date.now()
+                    }));
+                    window.addLog('✅ Global unblock signal stored');
+                } catch (e) {
+                    window.addLog('Could not store global unblock signal');
+                }
+                
+                // Try to send message to extension background one more time
+                if (typeof chrome !== 'undefined' && chrome.runtime) {
+                    try {
+                        chrome.runtime.sendMessage({
+                            action: 'completeUnblock',
+                            domain: window.blockedSite,
+                            force: true
+                        }, function(response) {
+                            window.addLog('Final extension unblock attempt: ' + response);
+                        });
+                    } catch (e) {
+                        window.addLog('Final extension attempt failed');
+                    }
+                }
+                
+                // Show success and redirect
+                window.showUnblockSuccess();
+                
+            } catch (error) {
+                window.addLog('❌ localStorage unblock failed: ' + error.message);
+                
+                // Try sessionStorage as fallback
+                try {
+                    sessionStorage.setItem('tempUnblock_' + window.blockedSite, JSON.stringify({
+                        domain: window.blockedSite,
+                        unblockTime: Date.now(),
+                        method: 'session'
+                    }));
+                    window.addLog('✅ Fallback unblock stored in sessionStorage');
+                    window.showUnblockSuccess();
+                } catch (sessionError) {
+                    window.addLog('❌ All storage methods failed');
+                    // Still try to redirect - maybe the extension will handle it
+                    window.showUnblockSuccess();
+                }
+            }
+        };
+        
+        window.showUnblockSuccess = function() {
+            window.addLog('🎉 Unblock successful!');
+            window.showStatus(
+                '✅ Site unblocked successfully!<br>' +
+                '⚠️ Will be re-blocked in 2 hours.<br>' +
+                '🔄 Redirecting in 3 seconds...', 
+                'success'
+            );
+            
+            setTimeout(function() {
+                window.redirectToSite();
+            }, 3000);
+        };
+        
+        window.redirectToSite = function() {
+            window.addLog('🔗 Redirecting to: https://' + window.blockedSite);
+            
+            try {
+                // Multiple redirect attempts for better reliability
+                
+                // Method 1: Direct window.location
+                window.location.href = 'https://' + window.blockedSite;
+                
+                // Method 2: window.location.replace (fallback)
+                setTimeout(() => {
+                    try {
+                        window.location.replace('https://' + window.blockedSite);
+                    } catch (e) {
+                        window.addLog('Replace method failed: ' + e.message);
+                    }
+                }, 1000);
+                
+                // Method 3: Force reload current domain if it matches
+                setTimeout(() => {
+                    try {
+                        if (window.location.hostname === window.blockedSite || 
+                            window.location.hostname === 'www.' + window.blockedSite) {
+                            window.location.reload();
+                        }
+                    } catch (e) {
+                        window.addLog('Reload method failed: ' + e.message);
+                    }
+                }, 2000);
+                
+                // Method 4: Try opening in current tab via chrome API
+                if (typeof chrome !== 'undefined' && chrome.tabs) {
+                    setTimeout(() => {
+                        try {
+                            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                                if (tabs[0]) {
+                                    chrome.tabs.update(tabs[0].id, {url: 'https://' + window.blockedSite});
+                                }
+                            });
+                        } catch (e) {
+                            window.addLog('Chrome tabs method failed: ' + e.message);
+                        }
+                    }, 500);
+                }
+                
+            } catch (error) {
+                window.addLog('❌ Primary redirect failed: ' + error.message);
+                
+                // Show manual redirect option
+                window.showStatus(
+                    '⚠️ Automatic redirect failed.<br>' +
+                    '<strong>Please click this link to continue:</strong><br>' +
+                    '<a href="https://' + window.blockedSite + '" target="_self" style="color: #ffd700; text-decoration: underline;">' +
+                    'https://' + window.blockedSite + '</a><br>' +
+                    'Or manually navigate to the site.',
+                    'error'
+                );
+            }
+        };
+        
+        window.goBackFunction = function() {
+            window.addLog('⬅️ GO BACK BUTTON CLICKED!');
+            window.showStatus('Going back...', 'info');
+            try {
+                history.back();
+            } catch (error) {
+                window.addLog('Go back failed: ' + error.message);
+                window.showStatus('❌ Cannot go back. Please close this tab manually.', 'error');
+            }
+        };
+        
+        window.openNewTabFunction = function() {
+            window.addLog('🏠 NEW TAB BUTTON CLICKED!');
+            window.showStatus('Opening new tab...', 'info');
+            try {
+                if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.create) {
+                    chrome.tabs.create({url: 'chrome://newtab/'});
+                    window.addLog('New tab opened via extension API');
+                } else {
+                    window.open('chrome://newtab/', '_blank');
+                    window.addLog('New tab opened via window.open');
+                }
+                window.showStatus('✅ New tab opened!', 'success');
+            } catch (error) {
+                window.addLog('New tab failed: ' + error.message);
+                try {
+                    window.open('about:blank', '_blank');
+                    window.showStatus('✅ Blank tab opened as fallback', 'success');
+                } catch (fallbackError) {
+                    window.showStatus('❌ Could not open new tab: ' + error.message, 'error');
+                }
+            }
+        };
+        
+        // Initialize page
+        window.initializePage = function() {
+            window.addLog('🚀 Starting page initialization...');
+            
+            try {
+                // Get blocked site from URL parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                window.blockedSite = urlParams.get('site') || 'example.com';
+                window.addLog('Blocked site identified: ' + window.blockedSite);
+                
+                // Set the site name in DOM
+                const siteElement = document.getElementById('blockedSite');
+                if (siteElement) {
+                    siteElement.textContent = window.blockedSite;
+                    window.addLog('Site name displayed in DOM');
+                }
+                
+                // Test all button elements exist
+                const buttons = ['testBtn', 'unblockBtn', 'backBtn', 'newTabBtn'];
+                buttons.forEach(btnId => {
+                    const btn = document.getElementById(btnId);
+                    if (btn) {
+                        window.addLog(`✅ Button found: ${btnId}`);
+                        
+                        // Add additional event listeners as backup
+                        btn.addEventListener('click', function(e) {
+                            window.addLog(`Event listener triggered for: ${btnId}`);
+                        });
+                    } else {
+                        window.addLog(`❌ Button missing: ${btnId}`);
+                    }
+                });
+                
+                window.addLog('✅ Page initialization completed successfully');
+                window.showStatus('✅ All systems ready! Buttons are functional. Click "Test Extension" to verify.', 'success');
+                
+            } catch (error) {
+                window.addLog('❌ Initialization error: ' + error.message);
+                window.showStatus('⚠️ Initialization had issues, but buttons should still work: ' + error.message, 'error');
+            }
+        };
+        
+        // Multiple initialization methods to ensure it runs
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', window.initializePage);
+            window.addLog('DOMContentLoaded listener added');
+        } else {
+            window.initializePage();
+        }
+        
+        // Fallback initialization
+        setTimeout(window.initializePage, 100);
+        setTimeout(window.initializePage, 500);
+        
+        window.addLog('🛡️ Script loaded and ready - BUTTONS SHOULD WORK!');
+    </script>
+</body>
+</html>

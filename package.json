@@ -1,0 +1,38 @@
+{
+  "name": "blockit-brave-clone",
+  "version": "1.0.0",
+  "description": "A comprehensive privacy-focused browser extension that replicates Brave browser functionality",
+  "main": "background/background.js",
+  "scripts": {
+    "build": "echo 'Building extension...' && npm run validate",
+    "validate": "node scripts/validate-manifest.js",
+    "test": "echo 'Running tests...'",
+    "lint": "eslint . --ext .js",
+    "format": "prettier --write .",
+    "zip": "zip -r blockit-extension.zip . -x '*.git*' 'node_modules/*' '*.md' 'package*.json' 'scripts/*'",
+    "clean": "rm -rf blockit-extension.zip"
+  },
+  "keywords": [
+    "chrome-extension",
+    "privacy",
+    "ad-blocker",
+    "brave",
+    "security",
+    "tracking-protection",
+    "fingerprinting-protection"
+  ],
+  "author": "BlockIt Team",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/blockit-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/blockit-extension/issues"
+  },
+  "homepage": "https://github.com/yourusername/blockit-extension#readme"
+}

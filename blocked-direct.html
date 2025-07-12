@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Site Blocked - Direct Unblock</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .blocked-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .blocked-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .blocked-domain {
+            font-size: 24px;
+            color: #ffd700;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+        
+        .warning-text {
+            background: rgba(255, 71, 87, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #ff4757;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            margin: 10px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+        
+        .btn-primary {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #ff3742;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .challenge-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            display: none;
+        }
+        
+        .challenge-section.active {
+            display: block;
+        }
+        
+        .challenge-question {
+            font-size: 18px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        
+        .challenge-input {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            margin: 10px;
+            width: 300px;
+            max-width: 90%;
+        }
+        
+        .challenge-result {
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .success { color: #00ff88; }
+        .error { color: #ff4757; }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .timer {
+            font-size: 24px;
+            color: #ffd700;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="blocked-icon">🚫</div>
+        <div class="blocked-title">Site Blocked</div>
+        <div class="blocked-domain" id="blockedSite">Loading...</div>
+        
+        <div class="warning-text">
+            <strong>⚠️ This site has been blocked for your productivity.</strong><br>
+            To unblock it, you'll need to complete a series of verification challenges.
+            <br><br>
+            <strong>🔄 Auto Re-blocking:</strong> Even if unblocked, this site will be automatically 
+            re-blocked after 2 hours.
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="startDirectUnblock()">
+                🔓 Start Unblock Process
+            </button>
+            <button class="btn btn-secondary" onclick="testExtension()" style="background: #28a745;">
+                🔧 Test Extension
+            </button>
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                ⬅️ Go Back
+            </a>
+            <a href="chrome://newtab/" class="btn btn-secondary">
+                🏠 New Tab
+            </a>
+        </div>
+        
+        <div id="statusArea" class="status" style="display: none;"></div>
+        
+        <!-- Challenge Section -->
+        <div id="challengeSection" class="challenge-section">
+            <h3>Verification Challenge</h3>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div>Step <span id="currentStep">1</span> of <span id="totalSteps">5</span></div>
+            
+            <div id="challengeContent">
+                <div id="challengeQuestion" class="challenge-question"></div>
+                <input type="text" id="challengeAnswer" class="challenge-input" placeholder="Enter your answer">
+                <div id="timerDisplay" class="timer" style="display: none;"></div>
+                <br>
+                <button class="btn btn-primary" onclick="submitAnswer()">Submit Answer</button>
+                <button class="btn btn-secondary" onclick="cancelUnblock()">Cancel</button>
+                <div id="challengeResult" class="challenge-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get blocked site from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const blockedSite = urlParams.get('site') || 'Unknown Site';
+        document.getElementById('blockedSite').textContent = blockedSite;
+
+        // Direct unblock system without relying on extension API
+        let currentChallenges = [];
+        let currentChallengeIndex = 0;
+        let unblockStartTime = null;
+
+        function showStatus(message, type = 'info') {
+            const statusArea = document.getElementById('statusArea');
+            statusArea.style.display = 'block';
+            statusArea.className = `status ${type}`;
+            statusArea.innerHTML = message;
+        }
+
+        function testExtension() {
+            showStatus('🔄 Testing extension...', 'info');
+            
+            // Test if chrome.runtime is available
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                try {
+                    chrome.runtime.sendMessage({action: 'getStats'}, (response) => {
+                        if (chrome.runtime.lastError) {
+                            showStatus('❌ Extension communication failed: ' + chrome.runtime.lastError.message, 'error');
+                        } else {
+                            showStatus('✅ Extension is working correctly!', 'success');
+                        }
+                    });
+                } catch (error) {
+                    showStatus('❌ Extension error: ' + error.message, 'error');
+                }
+            } else {
+                showStatus('❌ Extension API not available. Please check if the extension is loaded.', 'error');
+            }
+        }
+
+        function startDirectUnblock() {
+            showStatus('🔄 Starting unblock process...', 'info');
+            unblockStartTime = Date.now();
+            
+            // Generate challenges
+            currentChallenges = generateChallenges();
+            currentChallengeIndex = 0;
+            
+            document.getElementById('challengeSection').classList.add('active');
+            document.getElementById('totalSteps').textContent = currentChallenges.length;
+            
+            displayCurrentChallenge();
+        }
+
+        function generateChallenges() {
+            const challenges = [];
+            
+            // Math challenge
+            const a = Math.floor(Math.random() * 50) + 10;
+            const b = Math.floor(Math.random() * 50) + 10;
+            const c = Math.floor(Math.random() * 10) + 5;
+            challenges.push({
+                type: 'math',
+                question: `Solve: (${a} × ${b}) ÷ ${c} = ?`,
+                answer: Math.floor((a * b) / c).toString()
+            });
+
+            // Sequence challenge
+            const start = Math.floor(Math.random() * 10) + 1;
+            const diff = Math.floor(Math.random() * 5) + 2;
+            const sequence = [];
+            for (let i = 0; i < 5; i++) {
+                sequence.push(start + (i * diff));
+            }
+            const missing = sequence.pop();
+            challenges.push({
+                type: 'sequence',
+                question: `Complete the sequence: ${sequence.join(', ')}, ?`,
+                answer: missing.toString()
+            });
+
+            // Typing challenge
+            const phrases = [
+                'I understand that blocking sites helps my productivity',
+                'I will use the internet responsibly and focus on important tasks',
+                'Distraction-free browsing leads to better concentration'
+            ];
+            const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+            challenges.push({
+                type: 'typing',
+                question: `Type exactly: "${phrase}"`,
+                answer: phrase
+            });
+
+            // Wait challenge
+            const waitMinutes = 2; // 2 minutes
+            challenges.push({
+                type: 'wait',
+                question: `Wait ${waitMinutes} minutes before you can proceed`,
+                answer: 'WAITED',
+                waitTime: waitMinutes * 60 * 1000
+            });
+
+            // Final confirmation
+            challenges.push({
+                type: 'confirmation',
+                question: 'Type "I CONFIRM UNBLOCK" to proceed',
+                answer: 'I CONFIRM UNBLOCK'
+            });
+
+            return challenges;
+        }
+
+        function displayCurrentChallenge() {
+            if (currentChallengeIndex >= currentChallenges.length) {
+                completeUnblock();
+                return;
+            }
+
+            const challenge = currentChallenges[currentChallengeIndex];
+            const progress = ((currentChallengeIndex + 1) / currentChallenges.length) * 100;
+
+            document.getElementById('currentStep').textContent = currentChallengeIndex + 1;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('challengeQuestion').textContent = challenge.question;
+            document.getElementById('challengeAnswer').value = '';
+            document.getElementById('challengeResult').innerHTML = '';
+
+            // Handle wait challenges
+            if (challenge.waitTime) {
+                document.getElementById('challengeAnswer').style.display = 'none';
+                document.querySelector('button[onclick="submitAnswer()"]').style.display = 'none';
+                document.getElementById('timerDisplay').style.display = 'block';
+                
+                startWaitTimer(challenge.waitTime);
+            } else {
+                document.getElementById('challengeAnswer').style.display = 'block';
+                document.querySelector('button[onclick="submitAnswer()"]').style.display = 'block';
+                document.getElementById('timerDisplay').style.display = 'none';
+                document.getElementById('challengeAnswer').focus();
+            }
+        }
+
+        function startWaitTimer(waitTime) {
+            let remaining = waitTime;
+            const timer = setInterval(() => {
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('timerDisplay').textContent = 
+                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                remaining -= 1000;
+                
+                if (remaining <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('timerDisplay').textContent = 'Wait time completed!';
+                    setTimeout(() => {
+                        currentChallengeIndex++;
+                        displayCurrentChallenge();
+                    }, 1000);
+                }
+            }, 1000);
+        }
+
+        function submitAnswer() {
+            const answer = document.getElementById('challengeAnswer').value.trim();
+            const challenge = currentChallenges[currentChallengeIndex];
+            
+            if (answer.toLowerCase() === challenge.answer.toLowerCase()) {
+                document.getElementById('challengeResult').innerHTML = 
+                    '<div class="success">✅ Correct! Moving to next challenge...</div>';
+                
+                setTimeout(() => {
+                    currentChallengeIndex++;
+                    displayCurrentChallenge();
+                }, 1500);
+            } else {
+                document.getElementById('challengeResult').innerHTML = 
+                    '<div class="error">❌ Incorrect. Try again.</div>';
+            }
+        }
+
+        function completeUnblock() {
+            showStatus('🔄 Finalizing unblock...', 'info');
+            
+            // Try to communicate with extension
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                try {
+                    chrome.runtime.sendMessage({
+                        action: 'completeUnblock',
+                        domain: blockedSite
+                    }, (response) => {
+                        if (chrome.runtime.lastError || !response) {
+                            // Fallback: direct redirect
+                            performDirectUnblock();
+                        } else {
+                            showUnblockSuccess();
+                        }
+                    });
+                } catch (error) {
+                    performDirectUnblock();
+                }
+            } else {
+                performDirectUnblock();
+            }
+        }
+
+        function performDirectUnblock() {
+            // Store unblock in local storage as fallback
+            const unblockData = {
+                domain: blockedSite,
+                unblockTime: Date.now(),
+                reblockTime: Date.now() + (2 * 60 * 60 * 1000) // 2 hours
+            };
+            
+            try {
+                localStorage.setItem('tempUnblock_' + blockedSite, JSON.stringify(unblockData));
+            } catch (e) {
+                console.log('Could not store unblock data');
+            }
+            
+            showUnblockSuccess();
+        }
+
+        function showUnblockSuccess() {
+            document.getElementById('challengeSection').style.display = 'none';
+            showStatus(
+                '✅ Site unblocked successfully!<br>' +
+                '⚠️ Note: This site will be automatically re-blocked in 2 hours.<br>' +
+                'Redirecting in 3 seconds...', 
+                'success'
+            );
+            
+            setTimeout(() => {
+                window.location.href = `https://${blockedSite}`;
+            }, 3000);
+        }
+
+        function cancelUnblock() {
+            document.getElementById('challengeSection').classList.remove('active');
+            showStatus('❌ Unblock process cancelled.', 'error');
+        }
+
+        // Allow Enter key to submit answers
+        document.getElementById('challengeAnswer').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitAnswer();
+            }
+        });
+
+        // Initialize
+        showStatus('Site blocked. Click "Start Unblock Process" to begin verification.', 'info');
+    </script>
+</body>
+</html>

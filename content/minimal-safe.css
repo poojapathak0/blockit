@@ -1,0 +1,35 @@
+/* Minimal Safe CSS - Only specific ad blocking, won't break pages */
+
+/* Only hide very specific ad iframes and scripts */
+iframe[src*="doubleclick.net"],
+iframe[src*="googlesyndication.com"],
+iframe[src*="googletagmanager.com"],
+script[src*="doubleclick.net"],
+script[src*="googlesyndication.com"],
+script[src*="googletagmanager.com"],
+img[src*="doubleclick.net"][width="1"][height="1"],
+img[src*="google-analytics.com"][width="1"][height="1"] {
+  display: none !important;
+}
+
+/* Protection notification styles */
+.shield-blocked-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #28a745;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 10000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}

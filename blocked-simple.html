@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Site Blocked - Simple Version</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .blocked-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .blocked-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .blocked-domain {
+            font-size: 24px;
+            color: #ffd700;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+        
+        .blocked-message {
+            font-size: 18px;
+            line-height: 1.6;
+            margin: 20px 0;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+            min-width: 200px;
+        }
+        
+        .btn-primary {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #ff3742;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .challenge-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .challenge-question {
+            font-size: 18px;
+            margin: 15px 0;
+            color: #ffd700;
+        }
+        
+        .challenge-input {
+            padding: 12px;
+            width: 300px;
+            max-width: 100%;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            margin: 10px;
+        }
+        
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: #ffd700;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .result-message {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .success { background: rgba(40, 167, 69, 0.3); color: #28a745; }
+        .error { background: rgba(220, 53, 69, 0.3); color: #dc3545; }
+        .info { background: rgba(23, 162, 184, 0.3); color: #17a2b8; }
+        
+        .timer {
+            font-size: 24px;
+            color: #ffd700;
+            margin: 20px 0;
+        }
+        
+        .motivation {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="blocked-icon">🛡️</div>
+        <div class="blocked-title">Site Blocked</div>
+        <div class="blocked-domain" id="siteName">Loading...</div>
+        
+        <div class="blocked-message">
+            This website has been blocked to help you stay focused and productive. 
+            Unblocking requires completing multiple verification challenges.
+        </div>
+        
+        <div id="resultMessage" class="result-message" style="display: none;"></div>
+        
+        <div id="challengeSection" class="challenge-section">
+            <div>Challenge <span id="currentStep">1</span> of <span id="totalSteps">5</span></div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div id="challengeQuestion" class="challenge-question"></div>
+            <input type="text" id="challengeInput" class="challenge-input" placeholder="Enter your answer">
+            <div id="timer" class="timer" style="display: none;"></div>
+            <div class="motivation">
+                💡 Remember: This difficulty is intentional to help you build better browsing habits!
+            </div>
+        </div>
+        
+        <div>
+            <button id="unblockBtn" class="btn btn-primary" onclick="startUnblock()">
+                🔓 Start Unblock Process
+            </button>
+            <button id="submitBtn" class="btn btn-primary" onclick="submitAnswer()" style="display: none;">
+                ✅ Submit Answer
+            </button>
+            <button id="cancelBtn" class="btn btn-secondary" onclick="cancelUnblock()" style="display: none;">
+                ❌ Cancel
+            </button>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="javascript:history.back()" class="btn btn-secondary">⬅️ Go Back</a>
+            <a href="chrome://newtab/" class="btn btn-secondary">🏠 New Tab</a>
+        </div>
+    </div>
+    
+    <script>
+        // Simple inline JavaScript - no external dependencies
+        
+        // Get site name from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const siteName = urlParams.get('site') || 'Unknown Site';
+        document.getElementById('siteName').textContent = siteName;
+        
+        // Challenge data
+        let currentChallenge = 0;
+        let challenges = [];
+        let isUnblocking = false;
+        
+        // Generate challenges
+        function generateChallenges() {
+            challenges = [
+                {
+                    question: "Solve: 17 × 3 + 8 = ?",
+                    answer: "59"
+                },
+                {
+                    question: "Complete the sequence: 2, 4, 6, 8, ?",
+                    answer: "10"
+                },
+                {
+                    question: 'Type exactly: "I will focus on productive tasks"',
+                    answer: "I will focus on productive tasks"
+                },
+                {
+                    question: "What is 100 ÷ 4 × 2?",
+                    answer: "50"
+                },
+                {
+                    question: "Wait 30 seconds (type DONE when ready)",
+                    answer: "DONE",
+                    isWait: true,
+                    waitTime: 30
+                }
+            ];
+        }
+        
+        function showMessage(text, type = 'info') {
+            const msg = document.getElementById('resultMessage');
+            msg.textContent = text;
+            msg.className = 'result-message ' + type;
+            msg.style.display = 'block';
+            
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 3000);
+        }
+        
+        function startUnblock() {
+            console.log('Starting unblock process...');
+            generateChallenges();
+            currentChallenge = 0;
+            isUnblocking = true;
+            
+            // Hide unblock button, show challenge section
+            document.getElementById('unblockBtn').style.display = 'none';
+            document.getElementById('challengeSection').style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            document.getElementById('cancelBtn').style.display = 'inline-block';
+            
+            showMessage('Starting unblock challenges...', 'info');
+            displayChallenge();
+        }
+        
+        function displayChallenge() {
+            if (currentChallenge >= challenges.length) {
+                completeUnblock();
+                return;
+            }
+            
+            const challenge = challenges[currentChallenge];
+            const progress = ((currentChallenge + 1) / challenges.length) * 100;
+            
+            document.getElementById('currentStep').textContent = currentChallenge + 1;
+            document.getElementById('totalSteps').textContent = challenges.length;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('challengeQuestion').textContent = challenge.question;
+            document.getElementById('challengeInput').value = '';
+            document.getElementById('challengeInput').focus();
+            
+            if (challenge.isWait) {
+                startTimer(challenge.waitTime);
+            } else {
+                document.getElementById('timer').style.display = 'none';
+            }
+        }
+        
+        function startTimer(seconds) {
+            document.getElementById('timer').style.display = 'block';
+            let remaining = seconds;
+            
+            const updateTimer = () => {
+                document.getElementById('timer').textContent = `Wait: ${remaining} seconds`;
+                remaining--;
+                
+                if (remaining >= 0) {
+                    setTimeout(updateTimer, 1000);
+                } else {
+                    document.getElementById('timer').textContent = 'Time completed! Type DONE to continue.';
+                }
+            };
+            
+            updateTimer();
+        }
+        
+        function submitAnswer() {
+            const input = document.getElementById('challengeInput');
+            const answer = input.value.trim();
+            const challenge = challenges[currentChallenge];
+            
+            console.log('Submitted answer:', answer, 'Expected:', challenge.answer);
+            
+            if (answer.toLowerCase() === challenge.answer.toLowerCase()) {
+                showMessage('✅ Correct! Moving to next challenge...', 'success');
+                currentChallenge++;
+                
+                setTimeout(() => {
+                    displayChallenge();
+                }, 1500);
+            } else {
+                showMessage('❌ Incorrect answer. Try again!', 'error');
+                input.focus();
+            }
+        }
+        
+        function completeUnblock() {
+            document.getElementById('challengeSection').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('cancelBtn').style.display = 'none';
+            
+            showMessage('🎉 All challenges completed!', 'success');
+            
+            // Try to notify background script
+            if (window.chrome && chrome.runtime) {
+                chrome.runtime.sendMessage({
+                    action: 'completeUnblock',
+                    domain: siteName
+                }).then(() => {
+                    showMessage('✅ Site unblocked! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'https://' + siteName;
+                    }, 2000);
+                }).catch(() => {
+                    showMessage('⚠️ Challenges completed but couldn\'t update extension. You may need to manually remove the site from blocked list.', 'error');
+                });
+            } else {
+                showMessage('⚠️ Extension not available. Please manually remove the site from blocked list in extension options.', 'error');
+            }
+        }
+        
+        function cancelUnblock() {
+            document.getElementById('challengeSection').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.getElementById('unblockBtn').style.display = 'inline-block';
+            
+            showMessage('Unblock process cancelled.', 'info');
+            isUnblocking = false;
+        }
+        
+        // Enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && isUnblocking) {
+                submitAnswer();
+            }
+        });
+        
+        // Debug: Log when script loads
+        console.log('Blocked page script loaded for site:', siteName);
+        
+        // Test if buttons are clickable
+        document.getElementById('unblockBtn').addEventListener('click', function() {
+            console.log('Unblock button clicked!');
+        });
+    </script>
+</body>
+</html>

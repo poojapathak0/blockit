@@ -1,0 +1,68 @@
+/* YouTube Ad Blocker CSS - Hide ads immediately */
+
+/* Hide all video ads */
+.video-ads,
+.ytp-ad-module,
+.ytp-ad-overlay-container,
+.ytp-ad-text,
+.ytp-ad-skip-button-container,
+.ytp-ad-player-overlay,
+.ytp-ad-image-overlay,
+.ytp-ad-text-overlay,
+.ytp-ad-overlay-close-button {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+}
+
+/* Hide page ads */
+#player-ads,
+.ytd-promoted-sparkles-web-renderer,
+.ytd-ad-slot-renderer,
+.ytd-banner-promo-renderer,
+.advertisement-shelf,
+.sparkles-light-cta,
+.ytd-video-masthead-ad-v3-renderer,
+.ytd-primetime-promo-renderer,
+.ytd-display-ad-renderer {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+}
+
+/* Hide any element with ad in class or id */
+[class*="ad-"],
+[id*="ad-"],
+[class*="_ad"],
+[id*="_ad"],
+[class*="advertisement"],
+[class*="promoted"],
+[data-ad-slot-id] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Hide overlay elements */
+.ytp-ce-element,
+.ytp-cards-teaser,
+.iv-branding,
+.annotation {
+    display: none !important;
+}
+
+/* Make sure video is always visible */
+video {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Hide masthead ads */
+.ytd-rich-item-renderer .ytd-ad-slot-renderer,
+#masthead-ad {
+    display: none !important;
+}

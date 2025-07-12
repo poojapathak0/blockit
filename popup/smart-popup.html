@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            width: 350px;
+            min-height: 500px;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .stats-container {
+            padding: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stat-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        .protection-toggle {
+            margin: 20px;
+            text-align: center;
+        }
+        
+        .toggle-button {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-button:hover {
+            background: #00cc6a;
+            transform: translateY(-2px);
+        }
+        
+        .toggle-button.disabled {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .features {
+            padding: 0 20px 20px;
+        }
+        
+        .feature-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+        
+        .feature-toggle {
+            width: 40px;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .feature-toggle.enabled {
+            background: #00ff88;
+        }
+        
+        .feature-toggle::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-toggle.enabled::after {
+            transform: translateX(20px);
+        }
+        
+        .footer {
+            padding: 15px 20px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+            font-size: 11px;
+            opacity: 0.7;
+        }
+        
+        .real-time-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .threat-level {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            margin: 10px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .threat-level.low {
+            border-left: 4px solid #00ff88;
+        }
+        
+        .threat-level.medium {
+            border-left: 4px solid #ffa502;
+        }
+        
+        .threat-level.high {
+            border-left: 4px solid #ff4757;
+        }
+        
+        .protection-mode {
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .mode-label {
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .mode-toggle {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 2px;
+        }
+        
+        .mode-option {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 12px;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-option.active {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .mode-option:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .mode-option.active:hover {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+        }
+        
+        .warning-text {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🛡️ Smart Shield</div>
+        <div class="subtitle">AI-Enhanced Privacy Protection</div>
+    </div>
+    
+    <div class="protection-mode">
+        <div class="mode-label">Protection Mode:</div>
+        <div class="mode-toggle">
+            <div class="mode-option active" id="safeMode">
+                🔍 Safe Mode
+            </div>
+            <div class="mode-option" id="aggressiveMode">
+                ⚡ Aggressive
+            </div>
+        </div>
+        <div class="warning-text" id="modeWarning">
+            Safe mode protects search functionality
+        </div>
+    </div>
+    
+    <div class="threat-level low" id="threatLevel">
+        <span class="real-time-indicator"></span>
+        <span id="threatText">Threat Level: LOW - You're protected</span>
+    </div>
+    
+    <div class="stats-container">
+        <div class="stat-item">
+            <div class="stat-label">
+                <span class="stat-icon">🚫</span>
+                Ads Blocked
+            </div>
+            <div class="stat-value" id="adsBlocked">0</div>
+        </div>
+        
+        <div class="stat-item">
+            <div class="stat-label">
+                <span class="stat-icon">👁️</span>
+                Trackers Blocked
+            </div>
+            <div class="stat-value" id="trackersBlocked">0</div>
+        </div>
+        
+        <div class="stat-item">
+            <div class="stat-label">
+                <span class="stat-icon">🔒</span>
+                HTTPS Upgrades
+            </div>
+            <div class="stat-value" id="httpsUpgrades">0</div>
+        </div>
+        
+        <div class="stat-item">
+            <div class="stat-label">
+                <span class="stat-icon">🎭</span>
+                Fingerprinting Blocked
+            </div>
+            <div class="stat-value" id="fingerprintingBlocked">0</div>
+        </div>
+        
+        <div class="stat-item">
+            <div class="stat-label">
+                <span class="stat-icon">🦠</span>
+                Malware Blocked
+            </div>
+            <div class="stat-value" id="malwareBlocked">0</div>
+        </div>
+    </div>
+    
+    <div class="protection-toggle">
+        <button class="toggle-button" id="protectionToggle">
+            Protection Enabled
+        </button>
+    </div>
+    
+    <div class="features">
+        <div class="feature-item">
+            <span>Ad & Tracker Blocking</span>
+            <div class="feature-toggle enabled" data-feature="adblock"></div>
+        </div>
+        
+        <div class="feature-item">
+            <span>Fingerprinting Protection</span>
+            <div class="feature-toggle enabled" data-feature="fingerprinting"></div>
+        </div>
+        
+        <div class="feature-item">
+            <span>HTTPS Everywhere</span>
+            <div class="feature-toggle enabled" data-feature="https"></div>
+        </div>
+        
+        <div class="feature-item">
+            <span>WebRTC Leak Protection</span>
+            <div class="feature-toggle enabled" data-feature="webrtc"></div>
+        </div>
+        
+        <div class="feature-item">
+            <span>Smart Malware Detection</span>
+            <div class="feature-toggle enabled" data-feature="malware"></div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        AI-powered protection • Real-time threat analysis
+        <br>
+        <span id="lastUpdate">Last updated: Never</span>
+    </div>
+    
+    <script src="smart-popup.js"></script>
+</body>
+</html>

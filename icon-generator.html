@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        .icon-container {
+            margin: 20px;
+            display: inline-block;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            margin: 10px;
+        }
+        button {
+            background: #ff6600;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>BlockIt Icon Generator</h1>
+    <p>This tool helps generate PNG icons from the SVG design.</p>
+    
+    <div class="icon-container">
+        <h3>16x16</h3>
+        <canvas id="canvas16" width="16" height="16"></canvas>
+        <br>
+        <button onclick="downloadIcon(16)">Download 16x16</button>
+    </div>
+    
+    <div class="icon-container">
+        <h3>32x32</h3>
+        <canvas id="canvas32" width="32" height="32"></canvas>
+        <br>
+        <button onclick="downloadIcon(32)">Download 32x32</button>
+    </div>
+    
+    <div class="icon-container">
+        <h3>48x48</h3>
+        <canvas id="canvas48" width="48" height="48"></canvas>
+        <br>
+        <button onclick="downloadIcon(48)">Download 48x48</button>
+    </div>
+    
+    <div class="icon-container">
+        <h3>128x128</h3>
+        <canvas id="canvas128" width="128" height="128"></canvas>
+        <br>
+        <button onclick="downloadIcon(128)">Download 128x128</button>
+    </div>
+
+    <script>
+        function drawIcon(size) {
+            const canvas = document.getElementById(`canvas${size}`);
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#ff6600');
+            gradient.addColorStop(1, '#ff8533');
+            
+            // Draw circle
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2 - 2, 0, 2 * Math.PI);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Draw checkmark
+            ctx.beginPath();
+            ctx.moveTo(size * 0.25, size * 0.5);
+            ctx.lineTo(size * 0.4, size * 0.65);
+            ctx.lineTo(size * 0.75, size * 0.3);
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = Math.max(2, size/16);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+            
+            // Draw text for larger icons
+            if (size >= 48) {
+                ctx.font = `${size/10}px Arial`;
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.fillText('BLOCK', size/2, size * 0.85);
+            }
+        }
+        
+        function downloadIcon(size) {
+            const canvas = document.getElementById(`canvas${size}`);
+            const link = document.createElement('a');
+            link.download = `icon${size}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Draw all icons on page load
+        window.onload = function() {
+            drawIcon(16);
+            drawIcon(32);
+            drawIcon(48);
+            drawIcon(128);
+        };
+    </script>
+</body>
+</html>

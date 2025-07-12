@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockIt Extension Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .pass { background: #d4edda; border-color: #c3e6cb; }
+        .fail { background: #f8d7da; border-color: #f5c6cb; }
+        button {
+            background: #ff6600;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .stats {
+            background: #e2f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ BlockIt Extension Test Page</h1>
+        <p>This page helps you test if the BlockIt extension is working correctly.</p>
+        
+        <div class="test-section">
+            <h3>✅ Extension Status</h3>
+            <div id="extensionStatus">
+                <p>🔍 Checking if extension is loaded...</p>
+                <button onclick="checkExtension()">Check Extension</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Blocking Statistics</h3>
+            <div class="stats">
+                <div id="blockingStats">
+                    <p>Click the BlockIt icon in your browser toolbar to see real-time statistics!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test Features</h3>
+            <button onclick="testFingerprinting()">Test Fingerprinting Protection</button>
+            <button onclick="testCookies()">Test Cookie Blocking</button>
+            <button onclick="testHTTPS()">Test HTTPS Upgrade</button>
+            <div id="testResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 What to Look For</h3>
+            <ul>
+                <li>✅ BlockIt icon appears in browser toolbar</li>
+                <li>✅ Clicking icon shows popup with statistics</li>
+                <li>✅ Right-click shows context menu options</li>
+                <li>✅ Extension blocks ads and trackers on other websites</li>
+                <li>✅ Settings page accessible from popup</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🌐 Test on Real Websites</h3>
+            <p>Visit these websites to see the extension in action:</p>
+            <ul>
+                <li><a href="https://cnn.com" target="_blank">CNN.com</a> - Should block ads and trackers</li>
+                <li><a href="https://forbes.com" target="_blank">Forbes.com</a> - Should block many trackers</li>
+                <li><a href="https://reddit.com" target="_blank">Reddit.com</a> - Should show privacy protection</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function checkExtension() {
+            const statusDiv = document.getElementById('extensionStatus');
+            
+            // Check if extension is injecting content scripts
+            if (typeof window.BraveContentProtection !== 'undefined') {
+                statusDiv.innerHTML = '<p class="pass">✅ Extension is loaded and active!</p>';
+            } else {
+                statusDiv.innerHTML = '<p class="fail">❌ Extension may not be loaded. Check extensions page.</p>';
+            }
+        }
+
+        function testFingerprinting() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '<h4>🔍 Fingerprinting Test Results:</h4>';
+            
+            // Test user agent
+            results.innerHTML += `<p>User Agent: ${navigator.userAgent}</p>`;
+            
+            // Test screen resolution
+            results.innerHTML += `<p>Screen: ${screen.width}x${screen.height}</p>`;
+            
+            // Test languages
+            results.innerHTML += `<p>Languages: ${navigator.languages.join(', ')}</p>`;
+            
+            // Test timezone
+            results.innerHTML += `<p>Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}</p>`;
+        }
+
+        function testCookies() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '<h4>🍪 Cookie Test Results:</h4>';
+            
+            // Try to set a test cookie
+            document.cookie = "test_cookie=test_value; path=/";
+            
+            // Check if cookie was set
+            if (document.cookie.includes('test_cookie')) {
+                results.innerHTML += '<p>✅ Cookies are working (functional cookies allowed)</p>';
+            } else {
+                results.innerHTML += '<p>🛡️ Cookies are being blocked</p>';
+            }
+        }
+
+        function testHTTPS() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '<h4>🔒 HTTPS Test Results:</h4>';
+            
+            if (location.protocol === 'https:') {
+                results.innerHTML += '<p>✅ Page is using HTTPS</p>';
+            } else {
+                results.innerHTML += '<p>⚠️ Page is using HTTP - Extension will upgrade when possible</p>';
+            }
+        }
+
+        // Auto-check extension status on page load
+        window.addEventListener('load', function() {
+            setTimeout(checkExtension, 1000);
+        });
+    </script>
+</body>
+</html>

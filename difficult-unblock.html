@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Blocked - Multi-Step Verification Required</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .blocked-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .blocked-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .blocked-domain {
+            font-size: 24px;
+            color: #ffd700;
+            margin: 15px 0;
+            word-break: break-all;
+            font-weight: bold;
+        }
+        
+        .warning-text {
+            background: rgba(255, 71, 87, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #ff4757;
+        }
+        
+        .challenge-container {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px solid rgba(255, 71, 87, 0.3);
+            display: none;
+        }
+        
+        .challenge-container.active {
+            display: block;
+        }
+        
+        .challenge-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #ff4757;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #ff4757, #ff6b7a);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .step-counter {
+            font-size: 16px;
+            margin: 10px 0;
+            color: #ffd700;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 25px;
+            margin: 10px;
+            border: 2px solid white;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 180px;
+            background: #ff4757;
+            color: white;
+            user-select: none;
+            outline: none;
+        }
+        
+        .btn:hover {
+            background: #ff3742;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .btn-green {
+            background: #28a745;
+            border-color: #28a745;
+        }
+        
+        .challenge-input {
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            margin: 10px;
+            width: 300px;
+            max-width: 90%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+        }
+        
+        .challenge-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .timer {
+            font-size: 24px;
+            color: #ffd700;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .captcha-container {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            letter-spacing: 3px;
+            text-decoration: line-through;
+            transform: rotate(-5deg);
+        }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(0, 123, 255, 0.2);
+            border: 1px solid rgba(0, 123, 255, 0.5);
+        }
+        
+        .status.success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.5);
+        }
+        
+        .status.error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.5);
+        }
+        
+        .math-problem {
+            font-size: 22px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .typing-challenge {
+            font-size: 18px;
+            line-height: 1.6;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #ffd700;
+        }
+        
+        .reflection-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            resize: vertical;
+        }
+        
+        .final-warning {
+            background: linear-gradient(45deg, #ff4757, #ff6b7a);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            border: 3px solid #fff;
+            animation: warning-flash 2s infinite;
+        }
+        
+        @keyframes warning-flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        #motivationalQuote, #quoteAuthor {
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .quote-container {
+            animation: quote-glow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes quote-glow {
+            0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+            100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="blocked-icon">🚫</div>
+        <div class="blocked-title">Site Blocked - Verification Required</div>
+        <div class="blocked-domain" id="blockedSite">Loading...</div>
+        
+        <div class="warning-text">
+            ⚠️ <strong>This site has been blocked for your productivity.</strong><br>
+            To unblock it, you must complete ALL verification steps below.
+            <br><br>
+            🔄 <strong>Important:</strong> Even if unblocked, this site will be automatically 
+            re-blocked after 2 hours. Each failed attempt adds more challenges.
+        </div>
+        
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <div class="step-counter">Step <span id="currentStep">0</span> of <span id="totalSteps">7</span></div>
+        
+        <!-- Initial Buttons -->
+        <div id="initialButtons" class="action-buttons">
+            <button type="button" class="btn btn-green" id="testBtn">
+                🔧 Test Extension
+            </button>
+            
+            <button type="button" class="btn" id="startChallengeBtn">
+                🔓 Start Verification Process
+            </button>
+            
+            <button type="button" class="btn btn-secondary" id="backBtn">
+                ⬅️ Go Back
+            </button>
+        </div>
+        
+        <!-- Challenge 1: Math Problem -->
+        <div id="challenge1" class="challenge-container">
+            <div class="challenge-title">Challenge 1: Solve Complex Math Problem</div>
+            <div class="math-problem" id="mathProblem">Loading...</div>
+            <input type="text" id="mathAnswer" class="challenge-input" placeholder="Enter your answer">
+            <br>
+            <button type="button" class="btn" id="mathSubmit">Submit Answer</button>
+            <div id="mathResult"></div>
+        </div>
+        
+        <!-- Challenge 2: Wait Timer -->
+        <div id="challenge2" class="challenge-container">
+            <div class="challenge-title">Challenge 2: Mandatory Waiting Period</div>
+            <div>Please wait while we process your request...</div>
+            <div class="timer" id="waitTimer">02:00</div>
+            
+            <div style="margin: 30px 0;">
+                <h4 style="color: #ffd700; margin-bottom: 15px;">💡 Productivity Inspiration</h4>
+                <div id="motivationalQuote" class="quote-container" style="
+                    font-size: 18px;
+                    line-height: 1.6;
+                    font-style: italic;
+                    padding: 20px;
+                    background: rgba(255, 215, 0, 0.1);
+                    border-left: 4px solid #ffd700;
+                    border-radius: 8px;
+                    text-align: center;
+                    min-height: 80px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: opacity 0.3s ease-in-out;
+                ">
+                    Loading inspiration...
+                </div>
+                <div id="quoteAuthor" style="
+                    text-align: right;
+                    margin-top: 10px;
+                    font-size: 14px;
+                    color: #ffd700;
+                    font-weight: bold;
+                "></div>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 16px;">
+                🤔 Use this time to reflect: Do you really need to visit this site right now?<br>
+                💪 Consider what productive activities you could do instead!
+            </div>
+        </div>
+        
+        <!-- Challenge 3: Captcha -->
+        <div id="challenge3" class="challenge-container">
+            <div class="challenge-title">Challenge 3: Visual Captcha Verification</div>
+            <div>Type the characters you see below (case sensitive):</div>
+            <div class="captcha-container" id="captchaText">Loading...</div>
+            <input type="text" id="captchaAnswer" class="challenge-input" placeholder="Enter captcha text">
+            <br>
+            <button type="button" class="btn" id="captchaSubmit">Verify Captcha</button>
+            <button type="button" class="btn btn-secondary" id="captchaRefresh">New Captcha</button>
+            <div id="captchaResult"></div>
+        </div>
+        
+        <!-- Challenge 4: Typing Challenge -->
+        <div id="challenge4" class="challenge-container">
+            <div class="challenge-title">Challenge 4: Productivity Commitment</div>
+            <div>Type the following text exactly as shown (no copy/paste allowed):</div>
+            <div class="typing-challenge" id="typingText">Loading...</div>
+            <textarea id="typingAnswer" class="challenge-input" style="height: 100px; width: 100%;" 
+                      placeholder="Type the text exactly as shown above..."></textarea>
+            <br>
+            <button type="button" class="btn" id="typingSubmit">Check Typing</button>
+            <div id="typingResult"></div>
+        </div>
+        
+        <!-- Challenge 5: Sequence Pattern -->
+        <div id="challenge5" class="challenge-container">
+            <div class="challenge-title">Challenge 5: Pattern Recognition</div>
+            <div>Complete the number sequence:</div>
+            <div class="math-problem" id="sequenceProblem">Loading...</div>
+            <input type="text" id="sequenceAnswer" class="challenge-input" placeholder="Next number in sequence">
+            <br>
+            <button type="button" class="btn" id="sequenceSubmit">Submit Sequence</button>
+            <div id="sequenceResult"></div>
+        </div>
+        
+        <!-- Challenge 6: Self-Reflection -->
+        <div id="challenge6" class="challenge-container">
+            <div class="challenge-title">Challenge 6: Productivity Self-Reflection</div>
+            <div>Write at least 100 words about why you should focus on productive activities instead of visiting this site:</div>
+            <textarea id="reflectionAnswer" class="reflection-textarea" 
+                      placeholder="Write your reflection here... (minimum 100 words)"></textarea>
+            <div id="wordCount">Word count: 0</div>
+            <br>
+            <button type="button" class="btn" id="reflectionSubmit">Submit Reflection</button>
+            <div id="reflectionResult"></div>
+        </div>
+        
+        <!-- Challenge 7: Final Confirmation -->
+        <div id="challenge7" class="challenge-container">
+            <div class="challenge-title">Final Step: Last Chance to Reconsider</div>
+            <div class="final-warning">
+                🚨 FINAL WARNING 🚨<br><br>
+                You are about to unblock a potentially distracting website.<br>
+                This action will reduce your productivity and focus.<br><br>
+                Are you absolutely certain you want to proceed?<br>
+                This site will be automatically re-blocked in 2 hours.
+            </div>
+            <div>Type "I UNDERSTAND THE CONSEQUENCES" to proceed:</div>
+            <input type="text" id="finalAnswer" class="challenge-input" placeholder="Type confirmation phrase">
+            <br>
+            <button type="button" class="btn" id="finalSubmit">Final Confirmation</button>
+            <button type="button" class="btn btn-secondary" id="cancelProcess">Cancel Process</button>
+            <div id="finalResult"></div>
+        </div>
+        
+        <div id="statusArea" class="status">
+            ⚠️ Multi-step verification required. Click "Start Verification Process" to begin.
+        </div>
+    </div>
+
+    <script src="difficult-unblock-script-fixed.js"></script>
+</body>
+</html>
