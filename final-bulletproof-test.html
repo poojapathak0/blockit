@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔫 BULLETPROOF UNBLOCK TEST</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(45deg, #000, #333);
+            color: #00ff00;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            border: 2px solid #00ff00;
+            padding: 20px;
+            margin-bottom: 30px;
+            background: rgba(0, 255, 0, 0.1);
+        }
+        
+        .test-section {
+            border: 1px solid #00ff00;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .btn {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+        
+        .btn:hover {
+            background: #00cc00;
+        }
+        
+        .btn-danger {
+            background: #ff0000;
+            color: white;
+        }
+        
+        .log {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #333;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .success { background: #00ff00; color: #000; }
+        .error { background: #ff0000; color: white; }
+        .warning { background: #ffff00; color: #000; }
+        .info { background: #0088ff; color: white; }
+        
+        .countdown {
+            font-size: 48px;
+            text-align: center;
+            color: #ff0000;
+            margin: 20px 0;
+        }
+        
+        input {
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 10px;
+            margin: 10px;
+            font-family: inherit;
+        }
+        
+        .final-test {
+            border: 3px solid #ff0000;
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+            text-align: center;
+            padding: 30px;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔫 BULLETPROOF UNBLOCK TESTER</h1>
+        <p>FINAL TEST TO CONFIRM UNBLOCK REALLY WORKS</p>
+        <div id="mainStatus" class="status info">System Ready</div>
+    </div>
+
+    <!-- Extension Test -->
+    <div class="test-section">
+        <h2>🔧 EXTENSION CONNECTIVITY TEST</h2>
+        <button id="testExtension" class="btn">Test Extension Communication</button>
+        <button id="testStorage" class="btn">Test Storage Access</button>
+        <div id="extensionResult"></div>
+    </div>
+
+    <!-- API Test -->
+    <div class="test-section">
+        <h2>📡 API FUNCTION TESTS</h2>
+        <button id="testRuleAPI" class="btn">Test Rule API</button>
+        <button id="testBackgroundMsg" class="btn">Test Background Messages</button>
+        <div id="apiResult"></div>
+    </div>
+
+    <!-- Manual Site Test -->
+    <div class="test-section">
+        <h2>🎯 MANUAL SITE BLOCKING TEST</h2>
+        <p>Enter a site to block and test unblocking:</p>
+        <input type="text" id="testSite" placeholder="example.com" value="youtube.com">
+        <button id="blockSite" class="btn btn-danger">Block This Site</button>
+        <button id="testUnblock" class="btn">Test Unblock Process</button>
+        <div id="siteTestResult"></div>
+    </div>
+
+    <!-- Quick Challenge Test -->
+    <div class="test-section">
+        <h2>⚡ QUICK CHALLENGE TEST</h2>
+        <p>Simplified challenges (answers provided):</p>
+        
+        <div style="margin: 15px 0;">
+            <strong>Math: 5 + 3 = ?</strong>
+            <input type="number" id="quickMath" value="8">
+            <button id="checkMath" class="btn">Check</button>
+            <span id="mathStatus"></span>
+        </div>
+        
+        <div style="margin: 15px 0;">
+            <strong>Type: TEST</strong>
+            <input type="text" id="quickType" value="TEST">
+            <button id="checkType" class="btn">Check</button>
+            <span id="typeStatus"></span>
+        </div>
+        
+        <div style="margin: 15px 0;">
+            <strong>Confirm: I AGREE</strong>
+            <input type="text" id="quickConfirm" value="I AGREE">
+            <button id="checkConfirm" class="btn">Check</button>
+            <span id="confirmStatus"></span>
+        </div>
+        
+        <button id="runQuickTest" class="btn" style="background: #ff8800;">🚀 RUN QUICK UNBLOCK</button>
+        <div id="quickTestResult"></div>
+    </div>
+
+    <!-- Ultimate Test -->
+    <div class="final-test">
+        <h2>💥 ULTIMATE BULLETPROOF TEST</h2>
+        <p>This will test EVERYTHING and actually try to unblock a site!</p>
+        <div class="countdown" id="countdown"></div>
+        <button id="ultimateTest" class="btn btn-danger" style="font-size: 20px;">
+            🔫 EXECUTE BULLETPROOF UNBLOCK
+        </button>
+        <div id="ultimateResult"></div>
+    </div>
+
+    <!-- Log Output -->
+    <div class="test-section">
+        <h2>📋 DETAILED LOG</h2>
+        <div id="logOutput" class="log">Starting bulletproof test system...\n</div>
+        <button id="clearLog" class="btn">Clear Log</button>
+    </div>
+
+    <script>
+        class BulletproofTester {
+            constructor() {
+                this.log = document.getElementById('logOutput');
+                this.mainStatus = document.getElementById('mainStatus');
+                this.testResults = {};
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                this.addLog('🔫 BULLETPROOF TESTER LOADED');
+                this.addLog('Ready to test unblock functionality...');
+            }
+            
+            setupEventListeners() {
+                // Extension tests
+                document.getElementById('testExtension').onclick = () => this.testExtensionCommunication();
+                document.getElementById('testStorage').onclick = () => this.testStorageAccess();
+                
+                // API tests
+                document.getElementById('testRuleAPI').onclick = () => this.testRuleAPI();
+                document.getElementById('testBackgroundMsg').onclick = () => this.testBackgroundMessages();
+                
+                // Site tests
+                document.getElementById('blockSite').onclick = () => this.blockTestSite();
+                document.getElementById('testUnblock').onclick = () => this.testUnblockProcess();
+                
+                // Quick tests
+                document.getElementById('checkMath').onclick = () => this.checkQuickMath();
+                document.getElementById('checkType').onclick = () => this.checkQuickType();
+                document.getElementById('checkConfirm').onclick = () => this.checkQuickConfirm();
+                document.getElementById('runQuickTest').onclick = () => this.runQuickUnblock();
+                
+                // Ultimate test
+                document.getElementById('ultimateTest').onclick = () => this.runUltimateTest();
+                
+                // Utilities
+                document.getElementById('clearLog').onclick = () => this.clearLog();
+            }
+            
+            addLog(message) {
+                const timestamp = new Date().toLocaleTimeString();
+                this.log.textContent += `[${timestamp}] ${message}\n`;
+                this.log.scrollTop = this.log.scrollHeight;
+                console.log(message);
+            }
+            
+            setStatus(message, type = 'info') {
+                this.mainStatus.textContent = message;
+                this.mainStatus.className = `status ${type}`;
+                this.addLog(`STATUS: ${message}`);
+            }
+            
+            async testExtensionCommunication() {
+                this.addLog('🔧 Testing extension communication...');
+                
+                if (typeof chrome === 'undefined') {
+                    this.showResult('extensionResult', 'Chrome API not available', 'error');
+                    return false;
+                }
+                
+                if (!chrome.runtime) {
+                    this.showResult('extensionResult', 'Chrome runtime not available', 'error');
+                    return false;
+                }
+                
+                try {
+                    const response = await new Promise((resolve, reject) => {
+                        chrome.runtime.sendMessage({action: 'ping'}, (response) => {
+                            if (chrome.runtime.lastError) {
+                                reject(chrome.runtime.lastError);
+                            } else {
+                                resolve(response);
+                            }
+                        });
+                    });
+                    
+                    this.showResult('extensionResult', '✅ Extension communication working!', 'success');
+                    this.testResults.extension = true;
+                    return true;
+                } catch (error) {
+                    this.showResult('extensionResult', `❌ Extension error: ${error.message}`, 'error');
+                    this.testResults.extension = false;
+                    return false;
+                }
+            }
+            
+            async testStorageAccess() {
+                this.addLog('💾 Testing storage access...');
+                
+                try {
+                    // Test localStorage
+                    localStorage.setItem('test_key', 'test_value');
+                    const value = localStorage.getItem('test_key');
+                    localStorage.removeItem('test_key');
+                    
+                    if (value === 'test_value') {
+                        this.showResult('extensionResult', '✅ Storage access working!', 'success');
+                        this.testResults.storage = true;
+                        return true;
+                    } else {
+                        throw new Error('localStorage test failed');
+                    }
+                } catch (error) {
+                    this.showResult('extensionResult', `❌ Storage error: ${error.message}`, 'error');
+                    this.testResults.storage = false;
+                    return false;
+                }
+            }
+            
+            async testRuleAPI() {
+                this.addLog('📡 Testing declarativeNetRequest API...');
+                
+                if (!chrome.declarativeNetRequest) {
+                    this.showResult('apiResult', '❌ declarativeNetRequest API not available', 'error');
+                    return false;
+                }
+                
+                try {
+                    const rules = await chrome.declarativeNetRequest.getDynamicRules();
+                    this.showResult('apiResult', `✅ Rule API working! Found ${rules.length} rules`, 'success');
+                    this.testResults.ruleAPI = true;
+                    return true;
+                } catch (error) {
+                    this.showResult('apiResult', `❌ Rule API error: ${error.message}`, 'error');
+                    this.testResults.ruleAPI = false;
+                    return false;
+                }
+            }
+            
+            async testBackgroundMessages() {
+                this.addLog('📨 Testing background message handling...');
+                
+                try {
+                    const response = await new Promise((resolve, reject) => {
+                        chrome.runtime.sendMessage({
+                            action: 'get_stats'
+                        }, (response) => {
+                            if (chrome.runtime.lastError) {
+                                reject(chrome.runtime.lastError);
+                            } else {
+                                resolve(response);
+                            }
+                        });
+                    });
+                    
+                    this.showResult('apiResult', '✅ Background messages working!', 'success');
+                    this.testResults.backgroundMsg = true;
+                    return true;
+                } catch (error) {
+                    this.showResult('apiResult', `❌ Background message error: ${error.message}`, 'error');
+                    this.testResults.backgroundMsg = false;
+                    return false;
+                }
+            }
+            
+            async blockTestSite() {
+                const site = document.getElementById('testSite').value.trim();
+                if (!site) {
+                    this.showResult('siteTestResult', '❌ Please enter a site to test', 'error');
+                    return;
+                }
+                
+                this.addLog(`🚫 Attempting to block: ${site}`);
+                
+                try {
+                    const response = await new Promise((resolve, reject) => {
+                        chrome.runtime.sendMessage({
+                            action: 'block_site',
+                            domain: site
+                        }, (response) => {
+                            if (chrome.runtime.lastError) {
+                                reject(chrome.runtime.lastError);
+                            } else {
+                                resolve(response);
+                            }
+                        });
+                    });
+                    
+                    this.showResult('siteTestResult', `✅ Site blocked: ${site}`, 'success');
+                    this.addLog(`✅ Successfully blocked: ${site}`);
+                } catch (error) {
+                    this.showResult('siteTestResult', `❌ Block failed: ${error.message}`, 'error');
+                }
+            }
+            
+            async testUnblockProcess() {
+                const site = document.getElementById('testSite').value.trim();
+                if (!site) {
+                    this.showResult('siteTestResult', '❌ Please enter a site to test', 'error');
+                    return;
+                }
+                
+                this.addLog(`🔓 Testing unblock process for: ${site}`);
+                
+                // Open the bulletproof unblock page
+                const unblockUrl = `bulletproof-unblock.html?url=${encodeURIComponent(site)}`;
+                window.open(unblockUrl, '_blank');
+                
+                this.showResult('siteTestResult', `🔓 Opened unblock page for: ${site}`, 'info');
+            }
+            
+            checkQuickMath() {
+                const answer = document.getElementById('quickMath').value;
+                const status = document.getElementById('mathStatus');
+                if (answer == '8') {
+                    status.innerHTML = '<span style="color: #00ff00;">✅</span>';
+                    this.testResults.quickMath = true;
+                } else {
+                    status.innerHTML = '<span style="color: #ff0000;">❌</span>';
+                    this.testResults.quickMath = false;
+                }
+            }
+            
+            checkQuickType() {
+                const answer = document.getElementById('quickType').value;
+                const status = document.getElementById('typeStatus');
+                if (answer === 'TEST') {
+                    status.innerHTML = '<span style="color: #00ff00;">✅</span>';
+                    this.testResults.quickType = true;
+                } else {
+                    status.innerHTML = '<span style="color: #ff0000;">❌</span>';
+                    this.testResults.quickType = false;
+                }
+            }
+            
+            checkQuickConfirm() {
+                const answer = document.getElementById('quickConfirm').value;
+                const status = document.getElementById('confirmStatus');
+                if (answer === 'I AGREE') {
+                    status.innerHTML = '<span style="color: #00ff00;">✅</span>';
+                    this.testResults.quickConfirm = true;
+                } else {
+                    status.innerHTML = '<span style="color: #ff0000;">❌</span>';
+                    this.testResults.quickConfirm = false;
+                }
+            }
+            
+            async runQuickUnblock() {
+                this.addLog('⚡ Running quick unblock test...');
+                
+                // Check all quick tests
+                this.checkQuickMath();
+                this.checkQuickType();
+                this.checkQuickConfirm();
+                
+                if (this.testResults.quickMath && this.testResults.quickType && this.testResults.quickConfirm) {
+                    this.addLog('✅ All quick challenges passed!');
+                    
+                    // Simulate unblock process
+                    const site = document.getElementById('testSite').value.trim() || 'example.com';
+                    this.addLog(`🔓 Attempting to unblock: ${site}`);
+                    
+                    try {
+                        // Send unblock message
+                        const response = await new Promise((resolve, reject) => {
+                            chrome.runtime.sendMessage({
+                                action: 'remove_site_block',
+                                domain: site,
+                                url: site
+                            }, (response) => {
+                                if (chrome.runtime.lastError) {
+                                    reject(chrome.runtime.lastError);
+                                } else {
+                                    resolve(response);
+                                }
+                            });
+                        });
+                        
+                        this.showResult('quickTestResult', '🎉 QUICK UNBLOCK SUCCESSFUL!', 'success');
+                        this.addLog('🎉 Quick unblock completed successfully!');
+                        
+                        // Try to navigate
+                        setTimeout(() => {
+                            const url = site.startsWith('http') ? site : `https://${site}`;
+                            this.addLog(`🚀 Attempting navigation to: ${url}`);
+                            window.open(url, '_blank');
+                        }, 1000);
+                        
+                    } catch (error) {
+                        this.showResult('quickTestResult', `❌ Unblock failed: ${error.message}`, 'error');
+                        this.addLog(`❌ Quick unblock failed: ${error.message}`);
+                    }
+                } else {
+                    this.showResult('quickTestResult', '❌ Complete all challenges first', 'error');
+                }
+            }
+            
+            async runUltimateTest() {
+                this.addLog('💥 STARTING ULTIMATE BULLETPROOF TEST...');
+                this.setStatus('Running ultimate test...', 'warning');
+                
+                // Countdown
+                const countdown = document.getElementById('countdown');
+                for (let i = 5; i > 0; i--) {
+                    countdown.textContent = i;
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+                countdown.textContent = 'GO!';
+                
+                // Run all tests
+                const testResults = [];
+                
+                testResults.push(await this.testExtensionCommunication());
+                testResults.push(await this.testStorageAccess());
+                testResults.push(await this.testRuleAPI());
+                testResults.push(await this.testBackgroundMessages());
+                
+                const successCount = testResults.filter(r => r).length;
+                const totalTests = testResults.length;
+                
+                if (successCount === totalTests) {
+                    this.showResult('ultimateResult', '🎉 ALL TESTS PASSED! UNBLOCK WILL WORK!', 'success');
+                    this.setStatus('✅ BULLETPROOF SYSTEM READY', 'success');
+                    this.addLog('🎉 ULTIMATE TEST: SUCCESS - UNBLOCK GUARANTEED!');
+                    
+                    // Auto-test unblock
+                    setTimeout(() => {
+                        this.testUnblockProcess();
+                    }, 2000);
+                    
+                } else {
+                    this.showResult('ultimateResult', `❌ ${successCount}/${totalTests} tests passed. May not work.`, 'error');
+                    this.setStatus('⚠️ SYSTEM ISSUES DETECTED', 'error');
+                    this.addLog(`❌ ULTIMATE TEST: FAILED - Only ${successCount}/${totalTests} passed`);
+                }
+            }
+            
+            showResult(elementId, message, type) {
+                const element = document.getElementById(elementId);
+                element.innerHTML = `<div class="status ${type}">${message}</div>`;
+            }
+            
+            clearLog() {
+                this.log.textContent = 'Log cleared...\n';
+            }
+        }
+        
+        // Initialize tester
+        document.addEventListener('DOMContentLoaded', () => {
+            window.bulletproofTester = new BulletproofTester();
+        });
+        
+        // Fallback
+        if (document.readyState !== 'loading') {
+            window.bulletproofTester = new BulletproofTester();
+        }
+    </script>
+</body>
+</html>

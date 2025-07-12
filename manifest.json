@@ -99,7 +99,12 @@
                 "unblock-script.js",
                 "difficult-unblock-script.js",
                 "difficult-unblock-script-fixed.js",
-                "unblock-test.html"
+                "bulletproof-unblock-script.js",
+                "unblock-test.html",
+                "final-bulletproof-test.html",
+                "FINAL-UNBLOCK-VERIFICATION.html",
+                "PROOF-UNBLOCK-WORKS.html",
+                "youtube-ad-block-test.html"
             ],
             "matches": ["<all_urls>"]
         }
