@@ -107,15 +107,7 @@
       "resourceTypes": ["script"]
     }
   },
-  {
-    "id": 201,
-    "priority": 1,
-    "action": {"type": "block"},
-    "condition": {
-      "urlFilter": "*googlevideo.com*&dur=*",
-      "resourceTypes": ["xmlhttprequest"]
-    }
-  },
+  
   {
     "id": 202,
     "priority": 1,
@@ -169,14 +161,6 @@
       "regexFilter": ".*youtube\\.com.*[?&]ad[_=].*",
       "resourceTypes": ["xmlhttprequest"]
     }
-  },
-  {
-    "id": 208,
-    "priority": 1,
-    "action": {"type": "block"},
-    "condition": {
-      "regexFilter": ".*manifest\\.googlevideo\\.com.*dur=.*sq=.*",
-      "resourceTypes": ["xmlhttprequest"]
-    }
   }
+  
 ]

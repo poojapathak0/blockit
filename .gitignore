@@ -1,0 +1,50 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.history/
+
+# Node / Package
+node_modules/
+npm-debug.log*
+yarn-*.log
+pnpm-debug.log*
+package-lock.json
+
+# Builds / Bundles
+dist/
+build/
+coverage/
+.cache/
+
+# Archives
+*.zip
+blockit-extension.zip
+
+# Env / Secrets
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.pub
+id_rsa*
+id_ecdsa*
+id_ed25519*
+*.crt
+*.cer
+*.der
+*.jks
+*.keystore
+credentials.*
+secrets.*
+private.*
+*.sqlite
+*.db
+
+# Misc
+.eslintcache
+.prettier-cache

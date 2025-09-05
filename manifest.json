@@ -1,112 +1,64 @@
 {
-    "manifest_version": 3,
-    "name": "Smart Shield - AI Privacy Protection",
-    "version": "2.0.0",
-    "description": "AI-enhanced privacy protection with advanced ad blocking, tracker protection, and intelligent threat detection.",
-    
-    "permissions": [
-        "activeTab",
-        "scripting",
-        "declarativeNetRequest",
-        "declarativeNetRequestWithHostAccess",
-        "storage",
-        "notifications",
-        "contextMenus",
-        "webNavigation"
-    ],
-    
-    "host_permissions": [
-        "<all_urls>"
-    ],
-    
-    "background": {
-        "service_worker": "background/enhanced-background.js"
-    },
-    
-    "content_scripts": [
-        {
-            "matches": ["<all_urls>"],
-            "js": ["content/working-content.js", "content/unblock-helper.js", "content/productivity-reminder.js"],
-            "run_at": "document_end",
-            "all_frames": false
-        },
-        {
-            "matches": ["*://*.youtube.com/*"],
-            "js": ["content/minimal-youtube.js"],
-            "run_at": "document_end",
-            "all_frames": false
-        }
-    ],
-    
-    "action": {
-        "default_popup": "popup/smart-popup.html",
-        "default_title": "Smart Shield Protection",
-        "default_icon": {
-            "16": "icons/icon16.png",
-            "32": "icons/icon32.png",
-            "48": "icons/icon48.png",
-            "128": "icons/icon128.png"
-        }
-    },
-    
-    "options_page": "options/options.html",
-    
-    "icons": {
-        "16": "icons/icon16.png",
-        "32": "icons/icon32.png",
-        "48": "icons/icon48.png",
-        "128": "icons/icon128.png"
-    },
-    
-    "declarative_net_request": {
-        "rule_resources": [
-            {
-                "id": "ad_block_rules",
-                "enabled": true,
-                "path": "rules/ad_block_rules.json"
-            },
-            {
-                "id": "youtube_ad_block_rules",
-                "enabled": true,
-                "path": "rules/youtube_ad_block_rules.json"
-            },
-            {
-                "id": "privacy_rules",
-                "enabled": true,
-                "path": "rules/privacy_rules.json"
-            },
-            {
-                "id": "https_upgrade_rules",
-                "enabled": true,
-                "path": "rules/https_upgrade_rules.json"
-            }
-        ]
-    },
-    
-    "web_accessible_resources": [
-        {
-            "resources": [
-                "content/*",
-                "icons/*",
-                "blocked.html",
-                "blocked-direct.html",
-                "simple-unblock.html",
-                "debug-unblock.html",
-                "fixed-unblock.html",
-                "bulletproof-unblock.html",
-                "simple-safe-unblock.html",
-                "difficult-unblock.html",
-                "unblock-script.js",
-                "difficult-unblock-script.js",
-                "difficult-unblock-script-fixed.js",
-                "bulletproof-unblock-script.js",
-                "unblock-test.html",
-                "final-bulletproof-test.html",
-                "FINAL-UNBLOCK-VERIFICATION.html",
-                "PROOF-UNBLOCK-WORKS.html",
-                "youtube-ad-block-test.html"
-            ],
-            "matches": ["<all_urls>"]
-        }
+  "manifest_version": 3,
+  "name": "YouTube Ad Hider + BlockSite",
+  "version": "1.1",
+  "description": "Blocks YouTube ads and unwanted sites.",
+  "permissions": [
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "storage",
+    "scripting",
+    "activeTab",
+    "contextMenus"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ad_block_rules",
+        "enabled": true,
+        "path": "rules/ad_block_rules.json"
+      },
+      {
+        "id": "youtube_ad_block_rules",
+        "enabled": true,
+        "path": "rules/youtube_ad_block_rules.json"
+      },
+      {
+        "id": "privacy_rules",
+        "enabled": true,
+        "path": "rules/privacy_rules.json"
+      },
+      {
+        "id": "https_upgrade_rules",
+        "enabled": true,
+        "path": "rules/https_upgrade_rules.json"
+      }
     ]
+  },
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background/site-blocking.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.youtube.com/*"],
+  "js": ["content/minimal-youtube.js"],
+      "css": ["styles.css"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["blocked.html", "icons/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
 }

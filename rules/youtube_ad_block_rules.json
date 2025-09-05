@@ -1,14 +1,5 @@
 [
     {
-        "id": 1,
-        "priority": 10,
-        "action": { "type": "block" },
-        "condition": {
-            "regexFilter": ".*googlevideo\\.com.*[&?]dur=[0-9]+.*",
-            "resourceTypes": ["xmlhttprequest"]
-        }
-    },
-    {
         "id": 2,
         "priority": 10,
         "action": { "type": "block" },
@@ -122,15 +113,6 @@
         "action": { "type": "block" },
         "condition": {
             "urlFilter": "*youtube.com/get_video_info*",
-            "resourceTypes": ["xmlhttprequest"]
-        }
-    },
-    {
-        "id": 15,
-        "priority": 10,
-        "action": { "type": "block" },
-        "condition": {
-            "regexFilter": ".*manifest\\.googlevideo\\.com.*[&?]sq=[0-9]+.*dur=[0-9]+.*",
             "resourceTypes": ["xmlhttprequest"]
         }
     }

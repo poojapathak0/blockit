@@ -5,6 +5,11 @@
     console.log('🛡️ SAFE YOUTUBE AD BLOCKER: Starting...');
     
     let adBlockedCount = 0;
+    const playbackState = {
+        mutedByScript: false,
+        rateBoosted: false,
+        prevRate: 1
+    };
     
     // Block only specific YouTube ad requests
     function blockYouTubeAdRequests() {
@@ -12,6 +17,10 @@
         const originalXHROpen = XMLHttpRequest.prototype.open;
         
         XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+            // Never block media streams from googlevideo (prevents black screen)
+            if (typeof url === 'string' && url.includes('googlevideo.com')) {
+                return originalXHROpen.call(this, method, url, async, user, password);
+            }
             if (isSpecificYouTubeAdURL(url)) {
                 console.log('🚫 BLOCKED YOUTUBE AD REQUEST:', url);
                 adBlockedCount++;
@@ -22,21 +31,29 @@
         
         // Override fetch for specific YouTube ad URLs only
         const originalFetch = window.fetch;
-        window.fetch = function(...args) {
-            const url = args[0];
+        window.fetch = function(input, init) {
+            const url = typeof input === 'string' ? input : input && input.url;
+            // Never block media streams from googlevideo (prevents black screen)
+            if (typeof url === 'string' && url.includes('googlevideo.com')) {
+                return originalFetch.call(this, input, init);
+            }
             if (typeof url === 'string' && isSpecificYouTubeAdURL(url)) {
                 console.log('🚫 BLOCKED YOUTUBE AD FETCH:', url);
                 adBlockedCount++;
                 return Promise.resolve(new Response('', {status: 204}));
             }
-            return originalFetch.apply(this, args);
+            return originalFetch.call(this, input, init);
         };
     }
     
     function isSpecificYouTubeAdURL(url) {
-        // Very specific YouTube ad indicators only
+        // Never treat googlevideo (media) as ad
+        if (typeof url === 'string' && url.includes('googlevideo.com')) {
+            return false;
+        }
+
+        // Very specific YouTube ad indicators only (non-media)
         const youtubeAdIndicators = [
-            'googlevideo.com/videoplayback?',
             '/youtubei/v1/player/ad',
             '&ad_type=video',
             '&adformat=',
@@ -48,12 +65,10 @@
             'googlesyndication.com/pagead'
         ];
         
-        // Only block if it's clearly a YouTube domain AND has ad indicators
-        const isYouTubeDomain = url.includes('youtube.com') || 
-                               url.includes('googlevideo.com') || 
-                               url.includes('ytimg.com');
+        // Only block if it's clearly a YouTube/ytimg endpoint AND has ad indicators
+        const isYouTubeEndpoint = url.includes('youtube.com') || url.includes('ytimg.com');
         
-        return isYouTubeDomain && youtubeAdIndicators.some(indicator => url.includes(indicator));
+        return isYouTubeEndpoint && youtubeAdIndicators.some(indicator => url.includes(indicator));
     }
     
     // Safe ad blocking function
@@ -121,39 +136,71 @@
         }
     }
     
+    function isAdActive() {
+        // Robust ad detection
+        const player = document.getElementById('movie_player');
+        if (player && player.classList.contains('ad-showing')) return true;
+        return [
+            '.ytp-ad-player-overlay',
+            '.ytp-ad-text',
+            '.ytp-ad-overlay-container',
+            '.video-ads',
+            '.ytp-ad-preview-container'
+        ].some(sel => {
+            const el = document.querySelector(sel);
+            return el && el.offsetParent !== null;
+        });
+    }
+
     function skipVideoAds() {
         const video = document.querySelector('video');
         if (!video) return;
-        
-        // Check if ad is playing using specific YouTube indicators
-        const youtubeAdIndicators = [
-            '.ytp-ad-text',
-            '.ytp-ad-skip-button',
-            '.ytp-ad-overlay-container'
-        ];
-        
-        const isAdPlaying = youtubeAdIndicators.some(selector => {
-            const element = document.querySelector(selector);
-            return element && element.offsetParent !== null;
-        });
-        
-        if (isAdPlaying) {
-            console.log('🎯 YOUTUBE AD DETECTED - SKIPPING...');
-            
-            // Skip to end of ad
+
+        if (isAdActive()) {
+            // Prefer clicking skip when available
+            const skipButton = document.querySelector('.ytp-ad-skip-button, .ytp-skip-ad-button');
+            if (skipButton && skipButton.offsetParent !== null && !skipButton.disabled) {
+                skipButton.click();
+                // Prevent focus from staying on a control (keeps Space toggling play/pause)
+                try { skipButton.blur(); } catch (e) {}
+                const player = document.getElementById('movie_player') || document.querySelector('.html5-video-player');
+                try { if (player) player.focus(); } catch (e) {}
+                console.log('⏭️ Clicked skip button');
+                return;
+            }
+
+            // For unskippable/bumper ads: fast-forward safely
             try {
-                if (video.duration && video.duration > 0 && video.duration < 120) { // Only skip short ads
-                    video.currentTime = video.duration;
-                    console.log('⏭️ Skipped YouTube ad');
+                if (!video.muted) {
+                    video.muted = true;
+                    playbackState.mutedByScript = true;
+                }
+                if (video.duration && video.duration > 0 && video.duration <= 90) {
+                    video.currentTime = Math.max(video.currentTime, video.duration - 0.1);
+                    console.log('⏭️ Jumped to end of short ad');
+                } else {
+                    // Long unskippable: speed up, but don't affect real content later
+                    if (video.playbackRate < 16) {
+                        if (!playbackState.rateBoosted) {
+                            playbackState.prevRate = video.playbackRate || 1;
+                        }
+                        video.playbackRate = 16;
+                        playbackState.rateBoosted = true;
+                    }
                 }
             } catch (e) {}
-            
-            // Auto-click skip button if available
-            const skipButton = document.querySelector('.ytp-ad-skip-button, .ytp-skip-ad-button');
-            if (skipButton && skipButton.offsetParent !== null) {
-                skipButton.click();
-                console.log('⏭️ Clicked skip button');
-            }
+        } else {
+            // Restore normal playback when not in ad
+            try {
+                if (playbackState.rateBoosted && video.playbackRate !== playbackState.prevRate) {
+                    video.playbackRate = playbackState.prevRate;
+                    playbackState.rateBoosted = false;
+                }
+                if (playbackState.mutedByScript && video.muted) {
+                    video.muted = false;
+                    playbackState.mutedByScript = false;
+                }
+            } catch (e) {}
         }
     }
     
@@ -176,6 +223,33 @@
             } catch (e) {}
         });
     }
+
+    // Ensure the video and player are always visible
+    function ensureVideoVisible() {
+        try {
+            const playerContainers = [
+                '#movie_player',
+                '.html5-video-player',
+                '#player-container',
+                '#player'
+            ];
+            playerContainers.forEach(sel => {
+                const el = document.querySelector(sel);
+                if (el) {
+                    if (getComputedStyle(el).display === 'none') el.style.display = 'block';
+                    if (getComputedStyle(el).visibility === 'hidden') el.style.visibility = 'visible';
+                    if (getComputedStyle(el).opacity === '0') el.style.opacity = '1';
+                }
+            });
+
+            const video = document.querySelector('video.html5-main-video, #movie_player video');
+            if (video) {
+                if (getComputedStyle(video).display === 'none') video.style.display = 'block';
+                if (getComputedStyle(video).visibility === 'hidden') video.style.visibility = 'visible';
+                if (getComputedStyle(video).opacity === '0') video.style.opacity = '1';
+            }
+        } catch (e) {}
+    }
     
     // Enhanced skip button clicking
     function autoClickSkipButton() {
@@ -188,13 +262,16 @@
         
         skipButtons.forEach(selector => {
             try {
-                const button = document.querySelector(selector);
-                if (button && button.offsetParent !== null && !button.disabled) {
+        const button = document.querySelector(selector);
+        if (button && button.offsetParent !== null && !button.disabled) {
                     // Only click if it's clearly a YouTube skip button
                     const isYouTubeSkip = button.className.includes('ytp') || 
                                          button.getAttribute('aria-label')?.toLowerCase().includes('skip');
                     if (isYouTubeSkip) {
-                        button.click();
+            button.click();
+            try { button.blur(); } catch (e) {}
+            const player = document.getElementById('movie_player') || document.querySelector('.html5-video-player');
+            try { if (player) player.focus(); } catch (e) {}
                         console.log('⏭️ Auto-clicked skip button');
                     }
                 }
@@ -212,6 +289,9 @@
         
         // Auto-click skip buttons
         setInterval(autoClickSkipButton, 1000);
+        
+    // Keep video visible
+    setInterval(ensureVideoVisible, 1000);
         
         console.log('🛡️ Safe YouTube ad blocker initialized');
     }

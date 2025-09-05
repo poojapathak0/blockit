@@ -6,6 +6,7 @@
   "scripts": {
     "build": "echo 'Building extension...' && npm run validate",
     "validate": "node scripts/validate-manifest.js",
+  "scan:secrets": "node scripts/scan-secrets.js",
     "test": "echo 'Running tests...'",
     "lint": "eslint . --ext .js",
     "format": "prettier --write .",

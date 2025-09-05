@@ -166,14 +166,16 @@
     function initYouTubeAdBlocker() {
         blockYouTubeAds();
         
-        // Continuous monitoring
+        // Continuous monitoring (reduced frequency)
         setInterval(() => {
             removeAdElements();
             if (skipAds()) {
                 adBlockedCount++;
             }
             bypassAdOverlay();
-        }, 500); // Check every 500ms
+            // Only check speed limit occasionally
+            remove2xSpeedOption();
+        }, 2000); // Check every 2 seconds instead of 500ms
         
         // Observer for dynamically loaded content
         const observer = new MutationObserver((mutations) => {
@@ -235,6 +237,25 @@
             childList: true,
             subtree: true
         });
+    }
+
+    // Simple function to just limit playback speed to prevent 2x
+    function remove2xSpeedOption() {
+        try {
+            const video = document.querySelector('video');
+            if (video && video.playbackRate >= 2) {
+                video.playbackRate = 1.75; // Limit to 1.75x max
+                console.log('🚫 Limited playback speed to 1.75x');
+            }
+        } catch (error) {
+            // Fail silently to avoid breaking YouTube
+        }
+    }
+    
+    // Simple function to disable playback speed options (non-invasive)
+    function disablePlaybackSpeedOptions() {
+        // This function is now empty to avoid breaking YouTube
+        // We'll only use the playback rate limiting above
     }
     
     // Wait for YouTube to load

@@ -1,0 +1,52 @@
+/* Hide YouTube ad overlays, banners, and containers */
+.ytp-ad-player-overlay,
+.ytp-ad-overlay-slot,
+.ytp-ad-text,
+.video-ads,
+.ad-container,
+/* keep skip button visible for user and script */
+/* .ytp-ad-skip-button, */
+.ytp-ad-module,
+.ytp-ad-image-overlay,
+.ytp-ad-progress-list,
+.ytp-ad-progress,
+.ytp-ad-preview-container,
+.ytp-ad-message-container,
+/* do NOT hide .ytp-ad-interrupting to avoid black screen */
+/* .ytp-ad-interrupting, */
+.ytp-ad-action-interstitial,
+.ytp-ad-action-interstitial-slot,
+.ytp-ad-overlay-image,
+.ytp-ad-overlay-close-button,
+.ytp-ad-overlay-slot,
+.ytp-ad-overlay-image,
+.ytp-ad-overlay-text,
+.ytp-ad-overlay-link,
+.ytp-ad-overlay-title {
+  display: none !important;
+}
+
+/* Hide ad countdowns and text */
+.ytp-ad-duration-remaining,
+.ytp-ad-countdown,
+.ytp-ad-label {
+  display: none !important;
+}
+
+/* Hide ad banners below the video */
+#player-ads,
+#masthead-ad,
+#player-ads-container {
+  display: none !important;
+} 
+
+/* Ensure the YouTube player and video remain visible */
+#movie_player,
+.html5-video-player,
+#player-container,
+#player,
+video.html5-main-video {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}

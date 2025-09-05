@@ -346,7 +346,82 @@ class BravePopup {
   }
 }
 
-// Initialize popup when DOM is loaded
+// Handles toggles and site block list management
+
 document.addEventListener('DOMContentLoaded', () => {
-  new BravePopup();
+  const adblockToggle = document.getElementById('adblock-toggle');
+  const siteblockToggle = document.getElementById('siteblock-toggle');
+  const siteList = document.getElementById('site-list');
+  const addSiteInput = document.getElementById('add-site-input');
+  const addSiteBtn = document.getElementById('add-site-btn');
+
+  // Load state from storage
+  chrome.storage.local.get({ adblockEnabled: true, siteBlockEnabled: true, blockedSites: [] }, ({ adblockEnabled, siteBlockEnabled, blockedSites }) => {
+    adblockToggle.checked = adblockEnabled;
+    siteblockToggle.checked = siteBlockEnabled;
+    renderSiteList(blockedSites);
+  });
+
+  // Toggle ad-blocking
+  adblockToggle.addEventListener('change', () => {
+    const enabled = adblockToggle.checked;
+    chrome.storage.local.set({ adblockEnabled: enabled }, () => {
+      chrome.runtime.sendMessage({ type: 'TOGGLE_ADBLOCK', enabled });
+    });
+  });
+
+  // Toggle site-blocking
+  siteblockToggle.addEventListener('change', () => {
+    const enabled = siteblockToggle.checked;
+    chrome.storage.local.set({ siteBlockEnabled: enabled }, () => {
+      chrome.runtime.sendMessage({ type: 'TOGGLE_SITEBLOCK', enabled });
+    });
+  });
+
+  // Add site to block list
+  addSiteBtn.addEventListener('click', () => {
+    const domain = addSiteInput.value.trim();
+    if (!domain) return;
+    chrome.storage.local.get({ blockedSites: [] }, ({ blockedSites }) => {
+      if (!blockedSites.includes(domain)) {
+        const updated = [...blockedSites, domain];
+        chrome.storage.local.set({ blockedSites: updated }, () => {
+          chrome.runtime.sendMessage({ type: 'UPDATE_BLOCKED_SITES', blockedSites: updated });
+          renderSiteList(updated);
+          addSiteInput.value = '';
+        });
+      }
+    });
+  });
+
+  // Remove site from block list
+  function removeSite(domain) {
+    chrome.storage.local.get({ blockedSites: [] }, ({ blockedSites }) => {
+      const updated = blockedSites.filter(d => d !== domain);
+      chrome.storage.local.set({ blockedSites: updated }, () => {
+        chrome.runtime.sendMessage({ type: 'UPDATE_BLOCKED_SITES', blockedSites: updated });
+        renderSiteList(updated);
+      });
+    });
+  }
+
+  // Render block list
+  function renderSiteList(sites) {
+    siteList.innerHTML = '';
+    if (sites.length === 0) {
+      siteList.innerHTML = '<em>No sites blocked.</em>';
+      return;
+    }
+    sites.forEach(domain => {
+      const div = document.createElement('div');
+      div.className = 'site-item';
+      div.innerHTML = `<span class="site-domain">${domain}</span>`;
+      const btn = document.createElement('button');
+      btn.className = 'remove-btn';
+      btn.textContent = 'Remove';
+      btn.onclick = () => removeSite(domain);
+      div.appendChild(btn);
+      siteList.appendChild(div);
+    });
+  }
 });

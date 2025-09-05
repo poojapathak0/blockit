@@ -1,136 +1,49 @@
+<!-- popup/popup.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BlockIt - Brave Clone</title>
-  <link rel="stylesheet" href="popup.css">
+  <title>Ultimate Ad & Site Blocker</title>
+  <link rel="stylesheet" href="../popup/popup.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; width: 300px; }
+    .toggle-container { display: flex; align-items: center; margin-bottom: 12px; }
+    .toggle-label { margin-left: 8px; }
+    .switch { position: relative; display: inline-block; width: 40px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #4caf50; }
+    input:checked + .slider:before { transform: translateX(16px); }
+    .site-list { margin-top: 12px; }
+    .site-item { display: flex; align-items: center; margin-bottom: 4px; }
+    .site-domain { flex: 1; }
+    .remove-btn { background: #e74c3c; color: #fff; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; margin-left: 8px; }
+    .add-site { display: flex; margin-top: 8px; }
+    .add-input { flex: 1; padding: 4px; border: 1px solid #ccc; border-radius: 4px; }
+    .add-btn { margin-left: 8px; padding: 4px 10px; border: none; background: #4caf50; color: #fff; border-radius: 4px; cursor: pointer; }
+  </style>
 </head>
 <body>
-  <div class="popup-container">
-    <!-- Header -->
-    <div class="header">
-      <div class="logo">
-        <img src="../icons/icon32.png" alt="BlockIt" class="logo-img">
-        <h1>BlockIt</h1>
-      </div>
-      <div class="shields-toggle">
-        <label class="switch">
-          <input type="checkbox" id="shieldsToggle" checked>
-          <span class="slider"></span>
-        </label>
-        <span class="shields-text">Shields</span>
-      </div>
-    </div>
-
-    <!-- Site Info -->
-    <div class="site-info">
-      <div class="site-url" id="currentSite">Loading...</div>
-      <div class="site-status" id="siteStatus">Protected</div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-container">
-      <div class="stat-item">
-        <div class="stat-number" id="adsBlocked">0</div>
-        <div class="stat-label">Ads Blocked</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" id="trackersBlocked">0</div>
-        <div class="stat-label">Trackers Blocked</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" id="httpsUpgrades">0</div>
-        <div class="stat-label">HTTPS Upgrades</div>
-      </div>
-    </div>
-
-    <!-- Protection Settings -->
-    <div class="protection-settings">
-      <div class="setting-group">
-        <div class="setting-item">
-          <div class="setting-info">
-            <span class="setting-title">Ad & Tracker Blocking</span>
-            <span class="setting-desc">Block ads and trackers</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="adBlocking" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-info">
-            <span class="setting-title">HTTPS Upgrade</span>
-            <span class="setting-desc">Upgrade connections to HTTPS</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="httpsUpgrade" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-info">
-            <span class="setting-title">Block Scripts</span>
-            <span class="setting-desc">Block JavaScript execution</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="scriptBlocking">
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-info">
-            <span class="setting-title">Fingerprinting Protection</span>
-            <span class="setting-desc">Protect against fingerprinting</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="fingerprintingProtection" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-
-        <div class="setting-item">
-          <div class="setting-info">
-            <span class="setting-title">Cookie Blocking</span>
-            <span class="setting-desc">Block tracking cookies</span>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="cookieBlocking" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-      <button class="btn btn-secondary" id="reportSite">Report Issue</button>
-      <button class="btn btn-secondary" id="advancedSettings">Advanced</button>
-      <button class="btn btn-primary" id="reloadPage">Reload Page</button>
-    </div>
-
-    <!-- Global Stats -->
-    <div class="global-stats">
-      <div class="global-stat">
-        <span class="global-number" id="totalBlocked">0</span>
-        <span class="global-label">Total Blocked Today</span>
-      </div>
-      <button class="btn btn-link" id="resetStats">Reset Stats</button>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-      <div class="footer-links">
-        <a href="#" id="openOptions">Settings</a>
-        <a href="#" id="helpSupport">Help</a>
-        <a href="#" id="aboutBrave">About</a>
-      </div>
-    </div>
+  <div class="toggle-container">
+    <label class="switch">
+      <input type="checkbox" id="adblock-toggle">
+      <span class="slider"></span>
+    </label>
+    <span class="toggle-label">Ad & Tracker Blocking</span>
   </div>
-
+  <div class="toggle-container">
+    <label class="switch">
+      <input type="checkbox" id="siteblock-toggle">
+      <span class="slider"></span>
+    </label>
+    <span class="toggle-label">Site Blocking</span>
+  </div>
+  <div class="site-list" id="site-list"></div>
+  <div class="add-site">
+    <input type="text" id="add-site-input" class="add-input" placeholder="Add domain (e.g. facebook.com)">
+    <button id="add-site-btn" class="add-btn">Add</button>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>

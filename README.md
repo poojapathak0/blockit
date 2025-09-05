@@ -208,3 +208,11 @@ Need help?
 ---
 
 **Note**: This extension is not affiliated with Brave Software. It's an independent implementation inspired by Brave browser's privacy features.
+
+## YouTube Ad Blocking
+
+- The extension injects an aggressive content script and CSS on all YouTube pages, blocking all known ad types (pre-roll, mid-roll, overlays, banners, sponsored, etc.).
+- Network-level blocking is enforced using merged rules from filters.json and rules/youtube_ad_block_rules.json.
+- DOM and player-level blocking is handled by content/youtube-aggressive.js.
+- UI ad elements are hidden with content/youtube-blocker.css.
+- This multi-layered approach ensures the best possible YouTube ad blocking.

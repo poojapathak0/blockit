@@ -9,29 +9,8 @@
     
     console.log('🛡️ Minimal YouTube Ad Blocker: Starting...');
     
-    // Only block specific YouTube ad requests
-    function blockYouTubeAds() {
-        const originalFetch = window.fetch;
-        window.fetch = function(...args) {
-            const url = args[0];
-            if (typeof url === 'string' && url.includes('youtube.com')) {
-                // Only block very specific YouTube ad URLs
-                const youtubeAdPatterns = [
-                    '/youtubei/v1/player/ad',
-                    '&ad_type=video',
-                    'googlevideo.com/videoplayback?',
-                    '/api/stats/ads'
-                ];
-                
-                const isYouTubeAd = youtubeAdPatterns.some(pattern => url.includes(pattern));
-                if (isYouTubeAd) {
-                    console.log('🚫 Blocked YouTube ad:', url);
-                    return Promise.resolve(new Response('', {status: 204}));
-                }
-            }
-            return originalFetch.apply(this, args);
-        };
-    }
+    // Do not override network requests in minimal mode
+    function blockYouTubeAds() {}
     
     // Skip video ads safely
     function skipVideoAds() {
@@ -41,47 +20,19 @@
         // Only skip if we detect an ad is playing
         const adSkipButton = document.querySelector('.ytp-ad-skip-button');
         if (adSkipButton && adSkipButton.offsetParent !== null) {
-            // Click skip button
+            // Click skip button and preserve keyboard focus on player
             adSkipButton.click();
+            try { adSkipButton.blur(); } catch (_) {}
+            const player = document.getElementById('movie_player') || document.querySelector('.html5-video-player');
+            try { if (player) player.focus(); } catch (_) {}
             console.log('⏭️ Clicked skip button');
         }
         
-        // Check for ad text indicator
-        const adText = document.querySelector('.ytp-ad-text');
-        if (adText && adText.offsetParent !== null) {
-            // Speed up ad
-            try {
-                video.playbackRate = 16;
-                video.muted = true;
-            } catch (e) {}
-        } else {
-            // Restore normal playback when not in ad
-            try {
-                if (video.playbackRate === 16) {
-                    video.playbackRate = 1;
-                    video.muted = false;
-                }
-            } catch (e) {}
-        }
+    // Minimal mode: do not change playback or mute
     }
     
-    // Hide only specific YouTube ad containers
-    function hideYouTubeAdContainers() {
-        const adContainers = [
-            '.ytp-ad-module',
-            '#player-ads',
-            'ytd-promoted-sparkles-web-renderer'
-        ];
-        
-        adContainers.forEach(selector => {
-            try {
-                const elements = document.querySelectorAll(selector);
-                elements.forEach(element => {
-                    element.style.display = 'none';
-                });
-            } catch (e) {}
-        });
-    }
+    // Minimal mode: do not hide containers
+    function hideYouTubeAdContainers() {}
     
     // Initialize YouTube ad blocking
     blockYouTubeAds();
